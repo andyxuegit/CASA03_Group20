@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choropleth Map</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+    <script src="../js/choropleth-map.js"></script>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
+    <script
+        src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.min.js'></script>
+    <link rel='stylesheet'
+        href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.css'
+        type='text/css' />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="container">
+        <!-- <h1>Choropleth Map</h1> -->
+        <div class="content-wrapper">
+            <div id="map">
+                <div class="layer-control">
+                    <div class="layer-item">
+                        <div class="layer-header">
+                            <span class="layer-name">TripsLayer</span>
+                            <span class="layer-toggle" onclick="toggleLayer('trips-layer')">
+                                <div id="trips-layer" class="show-icon"></div>
+                            </span>
+                        </div>
+                        <div class="layer-legend show" id="trips-layer-legend">
+                            <div class="legend-items">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layer-item">
+                        <div class="layer-header">
+                            <span class="layer-name">BusinessDensityLayer</span>
+                            <span class="layer-toggle" onclick="toggleLayer('business-density-layer')">
+                                <div id="business-density-layer" class="hide-icon"></div>
+                            </span>
+                        </div>
+                        <div class="layer-legend" id="business-density-layer-legend">
+                            <div class="legend-items">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layer-item">
+                        <div class="layer-header">
+                            <span class="layer-name">PopulationDensityLayer</span>
+                            <span class="layer-toggle" onclick="toggleLayer('population-density-layer')">
+                                <div id="population-density-layer" class="hide-icon"></div>
+                            </span>
+                        </div>
+                        <div class="layer-legend" id="population-density-layer-legend">
+                            <div class="legend-items">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="layer-item">
+                        <div class="layer-header">
+                            <span class="layer-name">MedianIncomeLayer</span>
+                            <span class="layer-toggle" onclick="toggleLayer('median-income-layer')">
+                                <div id="median-income-layer" class="hide-icon"></div>
+                            </span>
+                        </div>
+                        <div class="layer-legend" id="median-income-layer-legend">
+                            <div class="legend-items">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layer-item">
+                        <div class="layer-header">
+                            <span class="layer-name">WhiteProportionLayer</span>
+                            <span class="layer-toggle" onclick="toggleLayer('white-proportion-layer')">
+                                <div id="white-proportion-layer" class="hide-icon"></div>
+                            </span>
+                        </div>
+                        <div class="layer-legend" id="white-proportion-layer-legend">
+                            <div class="legend-items">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sidebar">
+                <h2>Multidimensional Visualisation of Bikeshare Docking Station Service Buffer Zones</h2>
+                <div class="description">
+                    <p>We create a service buffer zone with a radius of 400 meters for each docking station to analyse
+                        the relationship between annual trip numbers of each station in 2024 and business density,
+                        population density, median household income, and white population proportion in the service
+                        buffer zone.</p>
+                    <p>The maximum distance that most users will walk to use the bikeshare is approximately one-quarter
+                        mile (~400 m) (LDA Consulting, 2015). Total annual trips of each station were obtained by adding
+                        outgoing trips and incoming trips according to the method in Caspi & Noland (2019). According to
+                        Caspi & Noland (2019) and Caspi (2023), Thiessen polygons were employed to allocate overlapping
+                        regions to the nearest station. The service area polygons show the spatial characteristics and
+                        help visualise the demographic and socioeconomic characteristics around each docking station.
+                    </p>
+                    <p>Demographic and socioeconomic data on the block group level were modified through areal
+                        interpolation to determine the service area polygon values derived from the interpolation
+                        surface.</p>
+                    <p><strong>Data source:</strong>
+                        <a class="data-source" target="_blank" href="https://www.rideindego.com/about/data/">Data - Indego</a>, 
+                        <a class="data-source" target="_blank" href="https://data.census.gov/">Census Bureau Data</a>, 
+                        <a class="data-source" target="_blank" href="https://business.yelp.com/data/resources/open-dataset/">Open Dataset | Yelp Data Licensing</a>
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mapbox access token
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYW54dWUiLCJhIjoiY20zcWw5NmRlMHN4MzJscXU5emlkN2U3aSJ9.OgMgSlL5oOFhzT52-zSoOA';
+
+        let popup = null;
+        let hoveredStateId = null;
+        let proportionData = null;
+        const layersId = ['population-density-layer', 'business-density-layer', 'trips-layer', 'median-income-layer', 'white-proportion-layer'];
+        const gradients = [
+            '#E3F2FD',
+            '#BBDEFB',
+            '#64B5F6',
+            '#EF9A9A',
+            '#EF5350',
+            '#F44336',
+            '#E53935',
+            '#D32F2F',
+            '#C62828',
+            '#B71C1C',
+            '#9E0000',
+            '#8B0000',
+        ];
+
+        let mergedServiceAreasData;
+
+        // Initialize map
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/anxue/cmacfdla500nw01skh1152nq5',
+            center: [-75.1652, 39.9526], // Philadelphia
+            zoom: 12,
+            maxBounds: [
+                [-75.380284, 39.771920], // Southwest coordinates (extended slightly)
+                [-74.855710, 40.237992]  // Northeast coordinates (extended slightly)
+            ]
+        });
+
+
+        // Add navigation controls
+        map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+
+        // Initialize map on load
+        map.on('load', async () => {
+            try {
+
+                fetch('../geojson/City_Plan_Boundary.geojson')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Add Philadelphia boundary source
+                        initOutsideMask(data)
+                        console.log(data)
+                        map.addSource('philly-boundary', {
+                            type: 'geojson',
+                            data: data
+                        });
+
+                        // Add a faint outline around Philadelphia
+                        map.addLayer({
+                            'id': 'philly-boundary-line',
+                            'type': 'line',
+                            'source': 'philly-boundary',
+                            'layout': {},
+                            'paint': {
+                                'line-color': '#fff',
+                                'line-width': 5,
+                                'line-opacity': 0.7
+                            }
+                        });
+
+                    })
+                    .catch(error => {
+                        console.error('Error fetching Philadelphia boundary:', error);
+                    });
+                const response = await fetch('../geojson/bike_buffer_wgs84.geojson');
+                mergedServiceAreasData = await response.json();
+                const response2 = await fetch('../geojson/service_area_proportion_surface_wgs84.geojson');
+                proportionData = await response2.json();
+                initChoroplethLayers();
+                setupMouseEvents();
+            } catch (error) {
+                console.error('Error initializing map:', error);
+            }
+        });
+
+        async function initChoroplethLayers() {
+
+            layersId.forEach(async (layerId) => {
+                const legendInfo = await initLegendInfo(layerId);
+                createLegendItems(layerId, legendInfo);
+                console.log(legendInfo);
+                let data = await initChoroplethDataWithLegend(mergedServiceAreasData, legendInfo, layerId);
+                if (layerId === 'white-proportion-layer') {
+                    data = await initChoroplethDataWithLegend(proportionData, legendInfo, layerId);
+                }
+                const choroplethData = {
+                    type: 'FeatureCollection',
+                    features: data
+                };
+                map.addSource(layerId, {
+                    type: 'geojson',
+                    data: choroplethData
+                });
+
+                // Add a faint outline around Philadelphia
+                map.addLayer({
+                    'id': layerId,
+                    'type': 'fill',
+                    'source': layerId,
+                    'layout': {
+                        'visibility': layerId === 'trips-layer' ? 'visible' : 'none'
+                    },
+                    'paint': {
+                        "fill-color": ["get", "color"],
+                        'fill-opacity': [
+                            'case',
+                            ['boolean', ['feature-state', 'hover'], false],
+                            0.7,
+                            0.9   // default
+                        ],
+                        'fill-outline-color': '#ffffff',
+
+                    }
+                });
+            });
+
+        }
+
+        //toggle layer
+        function toggleLayer(layerId) {
+            const img = document.getElementById(`${layerId}`);
+            //hide or show legend container
+            const legendContainer = document.getElementById(`${layerId}-legend`);
+
+            let isShow = img.classList.contains('show-icon');
+
+            if (isShow) {
+                img.classList.remove('show-icon');
+                img.classList.add('hide-icon');
+                legendContainer.style.display = 'none';
+            } else {
+                img.classList.remove('hide-icon');
+                img.classList.add('show-icon');
+                legendContainer.style.display = 'block';
+            }
+
+            layersId.forEach(layerItem => {
+                const layer = map.getLayer(layerId);
+                if (layerId === layerItem) {
+                    map.setLayoutProperty(`${layerId}`, 'visibility', isShow ? 'none' : 'visible');
+                } else {
+                    map.setLayoutProperty(`${layerItem}`, 'visibility', 'none');
+                    const imgItem = document.getElementById(`${layerItem}`);
+                    imgItem.classList.remove('show-icon');
+                    imgItem.classList.add('hide-icon');
+                    const otherLegendContainer = document.getElementById(`${layerItem}-legend`);
+                    otherLegendContainer.style.display = 'none';
+                }
+            });
+        }
+        //init legend info by layerId
+        async function initLegendInfo(layerId) {
+            const rangeList = [];
+            if (layerId === 'population-density-layer') {
+                const total = 3000000
+                const num = total / 400000
+                for (let i = 0; i <= num; i++) {
+                    rangeList.push({
+                        min: i * 400000,
+                        max: (i + 1) * 400000,
+                        color: gradients[i]
+                    })
+                }
+            } else if (layerId === 'business-density-layer') {
+                const total = 5000
+                const num = 500 / 100
+                for (let i = 0; i < num; i++) {
+
+                    rangeList.push({
+                        min: i * 100,
+                        max: (i + 1) * 100,
+                        color: gradients[i]
+                    })
+                }
+
+                for (let i = 0; i < total / 1000; i++) {
+
+                    rangeList.push({
+                        min: i * 1000 + 500,
+                        max: (i + 1) * 1000 + 500,
+                        color: gradients[i + num]
+                    })
+                }
+            } else if (layerId === 'trips-layer') {
+                const total = 45000
+                const num = total / 5000
+                for (let i = 0; i <= num; i++) {
+                    rangeList.push({
+                        min: i * 5000,
+                        max: (i + 1) * 5000,
+                        color: gradients[i]
+                    })
+                }
+            } else if (layerId === 'median-income-layer') {
+                const total = 220000
+                const num = total / 20000
+                for (let i = 0; i <= num; i++) {
+                    rangeList.push({
+                        min: i * 20000,
+                        max: (i + 1) * 20000,
+                        color: gradients[i]
+                    })
+                }
+            } else if (layerId === 'white-proportion-layer') {
+                const total = 100
+                const num = total / 10
+                for (let i = 0; i < num; i++) {
+                    rangeList.push({
+                        min: i * 10,
+                        max: (i + 1) * 10,
+                        color: gradients[i]
+                    })
+                }
+            }
+            return rangeList;
+        }
+        function createLegendItems(legendId, ranges) {
+            const legendContainer = document.getElementById(legendId + '-legend');
+            const legendItems = document.createElement('div');
+            legendItems.className = 'legend-items';
+
+            legendContainer.innerHTML = '';
+
+            ranges.forEach(range => {
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+
+                const colorSpan = document.createElement('span');
+                colorSpan.className = 'legend-color';
+                colorSpan.style.background = range.color;
+
+                const labelSpan = document.createElement('span');
+                labelSpan.className = 'legend-label';
+                labelSpan.textContent = `${range.min.toLocaleString()} - ${range.max.toLocaleString()}`;
+
+                item.appendChild(colorSpan);
+                item.appendChild(labelSpan);
+                legendItems.appendChild(item);
+            });
+
+            legendContainer.appendChild(legendItems);
+        }
+        //set outside mask
+        function initOutsideMask(data) {
+            const global = turf.polygon([[
+                [-180, -90],
+                [-180, 90],
+                [180, 90],
+                [180, -90],
+                [-180, -90]
+            ]])
+            const phillyBoundary = turf.polygon(data.features[0].geometry.coordinates)
+            const difference = turf.difference(global, phillyBoundary)
+            map.addLayer({
+                'id': 'difference-area',
+                'type': 'fill',
+                'source': {
+                    'type': 'geojson',
+                    'data': difference
+                },
+                'paint': {
+                    'fill-color': '#646464',
+                    'fill-opacity': 0.7,
+                }
+            });
+
+        }
+
+        function setupMouseEvents() {
+
+            const layersName = {
+                'population-density-layer': 'PopulationDensity',
+                'business-density-layer': 'BusinessDensity',
+                'trips-layer': 'Trips',
+                'median-income-layer': 'MedianIncome',
+                'white-proportion-layer': 'WhiteProportion'
+            }
+            const unit = {
+                'population-density-layer': 'people/km²',
+                'business-density-layer': 'business/km²',
+                'trips-layer': '',
+                'median-income-layer': 'USD',
+                'white-proportion-layer': '%'
+            }
+            layersId.forEach(layerId => {
+
+                map.on('mousemove', layerId, (e) => {
+                    const coordinates = e.lngLat
+                    const properties = e.features[0].properties;
+                    if (e.features.length > 0) {
+                        if (hoveredStateId) {
+                            map.setFeatureState(
+                                { source: layerId, id: hoveredStateId },
+                                { hover: false }
+                            );
+                        }
+                        hoveredStateId = e.features[0].id;
+                        map.setFeatureState(
+                            { source: layerId, id: hoveredStateId },
+                            { hover: true }
+                        );
+                    }
+                    // Create popup content
+                    const popupContent = `
+                                <div class="popup-content">
+                                <p><strong>Id:</strong> ${properties.id}</p>
+                                <p><strong>Name:</strong> ${properties.name}</p>
+                                <p><strong>${layersName[layerId]}:</strong> ${properties.value.toFixed(2) + ' ' + unit[layerId]}</p>
+                                </div>
+                            `;
+                    if (popup) popup.remove();
+                    popup = new mapboxgl.Popup()
+                        .setLngLat(coordinates)
+                        .setHTML(popupContent)
+                        .addTo(map);
+                });
+
+                map.on('mouseleave', layerId, () => {
+                    map.getCanvas().style.cursor = '';
+                    if (hoveredStateId) {
+                        map.setFeatureState(
+                            { source: layerId, id: hoveredStateId },
+                            { hover: false }
+                        );
+                    }
+                    hoveredStateId = null;
+
+                    if (popup) {
+                        popup.remove();
+                        popup = null;
+                    }
+                });
+            });
+        }
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Indego Bike Share — Overview</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    body { font-family: "Segoe UI", Arial, sans-serif; margin: 0; padding: 0; background: #f8f9fa; color: #333; }
+    header { background: #fff; padding: 16px 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: space-between; }
+    header h1 { margin: 0; font-size: 20px; }
+    header .controls { display: flex; align-items: center; gap: 12px; }
+    header select { padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; }
+    main { padding: 24px; max-width: 1200px; margin: auto; }
+    section { background: #fff; padding: 16px 24px; margin-bottom: 24px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    section h2 { margin-top: 0; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+    .metrics { display: flex; gap: 16px; flex-wrap: wrap; }
+    .metric { flex: 1; min-width: 140px; background: #f1f5f9; padding: 12px; border-radius: 4px; text-align: center; }
+    .metric .value { font-size: 24px; font-weight: bold; margin-bottom: 4px; }
+    svg { width: 100%; }
+    table { width: 100%; border-collapse: collapse; }
+    table th, table td { padding: 8px 12px; border-bottom: 1px solid #eee; text-align: left; }
+    table th { background: #fafafa; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Indego Bike Share — Overview</h1>
+    <div class="controls">
+      <label for="month-select">Month:</label>
+      <select id="month-select">
+        <option value="1">January</option>
+        <option value="2">February</option>
+        <option value="3">March</option>
+        <option value="4">April</option>
+        <option value="5">May</option>
+        <option value="6">June</option>
+        <option value="7">July</option>
+        <option value="8">August</option>
+        <option value="9">September</option>
+        <option value="10">October</option>
+        <option value="11">November</option>
+        <option value="12">December</option>
+      </select>
+    </div>
+  </header>
+  <main>
+    <section id="key-metrics">
+      <h2>1. Key Metrics</h2>
+      <div class="metrics">
+        <div class="metric"><div class="value" id="total-trips">--</div><div class="label">Total Trips</div></div>
+        <div class="metric"><div class="value" id="total-duration">--</div><div class="label">Total Duration (hrs)</div></div>
+        <div class="metric"><div class="value" id="avg-duration">--</div><div class="label">Avg Trip Duration (min)</div></div>
+        <div class="metric"><div class="value" id="avg-distance">--</div><div class="label">Avg Trip Distance (km)</div></div>
+      </div>
+    </section>
+    <section id="daily-trend"><h2>2. Daily Trend</h2><svg id="daily-bar-chart" style="height:240px;"></svg></section>
+    <section id="weekday-profile"><h2>3. Weekday vs. Weekend Distribution</h2><svg id="weekday-line-chart" style="height:240px;"></svg></section>
+    <section id="hourly-trend"><h2>4. Hourly Transactions</h2><svg id="hourly-bar-chart" style="height:240px;"></svg></section>
+    <section id="duration-dist"><h2>5. Duration Distribution (≤100 min)</h2><svg id="duration-histogram" style="height:260px;"></svg></section>
+    <section id="top-stations"><h2>6. Top 10 Stations</h2><table><thead><tr><th>Station</th><th>Ride Count</th></tr></thead><tbody id="stations-table-body"></tbody></table></section>
+    <section id="top-routes"><h2>7. Top 10 Routes</h2><table><thead><tr><th>Start Station</th><th>End Station</th><th>Ride Count</th></tr></thead><tbody id="routes-table-body"></tbody></table></section>
+  </main>
+  <script>
+  (async function(){
+    function haversine(lat1, lon1, lat2, lon2) {
+      const toRad = d => d * Math.PI/180;
+      const R = 6371;
+      const dLat = toRad(lat2 - lat1), dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+    const files = ['indego-trips-2024-q1.csv','indego-trips-2024-q2.csv','indego-trips-2024-q3.csv','indego-trips-2024-q4.csv'];
+    let all=[];
+    for(const url of files){
+      const part=await d3.csv(url,d=>({
+        start_time:new Date(d.start_time),
+        duration:+d.duration,
+        distance:haversine(+d.start_lat,+d.start_lon,+d.end_lat,+d.end_lon),
+        start_station:d.start_station,
+        end_station:d.end_station
+      }));
+      all=all.concat(part);
+    }
+    const ms=d3.select('#month-select');
+    ms.on('change',()=>render(+ms.node().value));
+    render(+ms.node().value);
+    function render(m){
+      const data=all.filter(d=>d.start_time.getMonth()+1===m);
+      const totalTrips=data.length;
+      const totalHours=d3.sum(data,d=>d.duration)/60;
+      const avgDuration=d3.mean(data,d=>d.duration);
+      const avgDistance=d3.mean(data,d=>d.distance);
+      d3.select('#total-trips').text(d3.format(',')(totalTrips));
+      d3.select('#total-duration').text(d3.format('.1f')(totalHours));
+      d3.select('#avg-duration').text(d3.format('.1f')(avgDuration));
+      d3.select('#avg-distance').text(d3.format('.2f')(avgDistance));
+      const dailyMap=d3.rollup(data,v=>v.length,d=>d3.timeDay(d.start_time));
+      const dailyArr=Array.from(dailyMap,([date,count])=>({day:d3.timeFormat('%d')(date),count}));
+      dailyArr.sort((a,b)=>+a.day-+b.day);
+      drawBar('#daily-bar-chart',dailyArr,'day','count');
+      const wdMap=d3.rollup(data,v=>v.length,d=>d.start_time.getDay());
+      const labels=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+      const wdArr=[1,2,3,4,5,6,0].map((d,i)=>({weekday:labels[i],count:wdMap.get(d)||0}));
+      drawBar('#weekday-line-chart',wdArr,'weekday','count');
+      const hrMap=d3.rollup(data,v=>v.length,d=>d.start_time.getHours());
+      const hrArr=Array.from(hrMap,([h,c])=>({hour:h,count:c})).sort((a,b)=>a.hour-b.hour);
+      drawBar('#hourly-bar-chart',hrArr,'hour','count');
+      const durations=data.map(d=>d.duration).filter(d=>d<=100);
+      drawHistogram('#duration-histogram',durations,{domainMax:100});
+      const stMap=d3.rollup(data,v=>v.length,d=>d.start_station);
+      const topStations=Array.from(stMap,([s,c])=>({station:s,count:c})).sort((a,b)=>b.count-a.count).slice(0,10);
+      const stBody=d3.select('#stations-table-body').selectAll('tr').data(topStations).join('tr');
+      stBody.html(d=>`<td>${d.station}</td><td>${d3.format(',')(d.count)}</td>`);
+      const rtMap=d3.rollup(data,v=>v.length,d=>d.start_station,d=>d.end_station);
+      let routes=[];for(const [s,m] of rtMap)for(const [e,c] of m)routes.push({start:s,end:e,count:c});
+      const topRoutes=routes.sort((a,b)=>b.count-a.count).slice(0,10);
+      const rtBody=d3.select('#routes-table-body').selectAll('tr').data(topRoutes).join('tr');
+      rtBody.html(d=>`<td>${d.start}</td><td>${d.end}</td><td>${d3.format(',')(d.count)}</td>`);
+    }
+    function drawBar(sel,data,xKey,yKey){const svg=d3.select(sel);svg.selectAll('*').remove();const margin={top:20,right:20,bottom:50,left:50},W=parseInt(svg.style('width'))-margin.left-margin.right,H=parseInt(svg.style('height'))-margin.top-margin.bottom;const g=svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);const xScale=d3.scaleBand().domain(data.map(d=>d[xKey])).range([0,W]).padding(0.2);const yScale=d3.scaleLinear().domain([0,d3.max(data,d=>d[yKey])*1.1]).range([H,0]);g.append('g').call(d3.axisLeft(yScale).ticks(5));g.append('g').attr('transform',`translate(0,${H})`).call(d3.axisBottom(xScale)).selectAll('text').attr('transform','rotate(-40)').style('text-anchor','end');g.selectAll('rect').data(data).join('rect').attr('x',d=>xScale(d[xKey])).attr('y',d=>yScale(d[yKey])).attr('width',xScale.bandwidth()).attr('height',d=>H-yScale(d[yKey])).attr('fill','#4285f4');}
+    function drawHistogram(sel,values,opts={}){const svg=d3.select(sel);svg.selectAll('*').remove();const margin={top:20,right:20,bottom:50,left:50},W=parseInt(svg.style('width'))-margin.left-margin.right,H=parseInt(svg.style('height'))-margin.top-margin.bottom;const g=svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);const xScale=d3.scaleLinear().domain([0,opts.domainMax||d3.max(values)]).range([0,W]);const bins=d3.bin().domain(xScale.domain()).thresholds(20)(values);const yScale=d3.scaleLinear().domain([0,d3.max(bins,d=>d.length)*1.1]).range([H,0]);g.append('g').call(d3.axisLeft(yScale).ticks(5));g.append('g').attr('transform',`translate(0,${H})`).call(d3.axisBottom(xScale));g.selectAll('rect').data(bins).join('rect').attr('x',d=>xScale(d.x0)+1).attr('y',d=>yScale(d.length)).attr('width',d=>Math.max(0,xScale(d.x1)-xScale(d.x0)-1)).attr('height',d=>H-yScale(d.length)).attr('fill','#4CAF50');}
+  })();
+  </script>
+</body>
+</html>

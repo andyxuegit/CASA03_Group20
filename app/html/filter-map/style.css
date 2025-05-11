@@ -1,0 +1,213 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+#map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+.map-overlay {
+    position: absolute;
+    bottom: 30px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+    max-width: 300px;
+}
+
+.legend {
+    padding: 10px;
+    line-height: 25px;
+}
+
+.legend-key {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    border-radius: 50%;
+}
+
+.loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+}
+
+#neighborhood-info {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+    display: none;
+}
+
+.map-title {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px 15px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+
+.map-title h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #333;
+}
+
+.search-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1;
+    width: 250px;
+}
+
+.geocoder {
+    width: 100%;
+}
+
+.mapboxgl-ctrl-geocoder {
+    min-width: 100%;
+}
+
+/* Removed style-control styles as we're removing those buttons */
+/* Removed simplify-control styles as we're removing that button */
+.filter-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 220px;
+    height: 250px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+
+.filter-container h4 {
+    margin: 5px;
+    font-size: 16px;
+    color: #333;
+}
+
+.filter-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+}
+
+.pButton {
+    width: 100%;
+    padding: 8px;
+    margin-top: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+    background-color: #f5f5f5;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.pButton:hover {
+    background-color: #e8e8e8;
+    border-color: #ccc;
+}
+
+.pButton:active {
+    background-color: #ddd;
+    transform: translateY(1px);
+}
+.info-panel {
+    position: absolute;
+    top: 20px;
+    right: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+    max-width: 300px;
+}
+
+.info-panel p {
+    margin: 0;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.layer-control {
+    position: absolute;
+    top: 200px;
+    right: 10px;
+    width: 250px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 10px 0;
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+
+}
+
+.layer-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 15px;
+    font-weight: bold;
+    color: #222;
+}
+
+.layer-item:last-child {
+    border-bottom: none;
+}
+
+.layer-toggle {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+.layer-toggle img {
+    display: block;
+    margin: 0;
+    vertical-align: middle;
+}
+
+
+.layer-toggle:hover {
+    opacity: 1;
+    border-radius: 5px;
+    background-color: #e8e8e8;
+}

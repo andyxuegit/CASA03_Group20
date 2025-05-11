@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Philadelphia Business Map</title>
+    <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js'></script>
+    <script src="../js/map.js"></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css' rel='stylesheet' />
+    <script
+        src='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.min.js'></script>
+    <link rel='stylesheet'
+        href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.0/mapbox-gl-geocoder.css'
+        type='text/css' />
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id="loading" class="loading">Loading Yelp business data...</div>
+    <div class="info-panel">
+        <p>Click on a business point to view its detailed information.</p>
+        <p>Click on a bike station point to view its detailed information.</p>
+        <p>Control the visibility of layers using the panel on the right.</p>
+    </div>
+    <div id="neighborhood-info"></div>
+    <div class="search-container">
+        <div id="geocoder" class="geocoder"></div>
+    </div>
+    <div class="map-overlay">
+        <div class="legend">
+            <h3>Business Types</h3>
+            <div id="legend-content"></div>
+        </div>
+    </div>
+    <div class="map-title">
+        <h2>Philadelphia Business Map</h2>
+    </div>
+    <div class="filter-container">
+        <h4>Filter by Neighbourhood:</h4>
+        <select class="filter-select" id="neighborhood-select">
+        </select>
+        <h4>Filter by Business Type:</h4>
+        <select class="filter-select" id="business-type-select">
+        </select>
+        <h4>Filter by Minimum Rating:</h4>
+        <select class="filter-select" id="rating-select">
+        </select>
+        <div style=" text-align: center;">
+            <!-- <button id="cancel-button" class="pButton" onclick="cancelFilter()">cancel</button> -->
+            <button id="filter-button" class="pButton" onclick="filterByCondition()">Filter</button>
+        </div>
+
+    </div>
+    <div class="layer-control">
+        <div class="layer-item">
+            <span class="layer-name">BicycleTransitLayer</span>
+            <span class="layer-toggle" onclick="toggleLayer('bike-layer')"><img id="bike-layer" src="../../img/show.png"
+                    style="width: 20px; height: 20px;"></span>
+        </div>
+        <div class="layer-item">
+            <span class="layer-name">BusinessTypeLayer</span>
+            <span class="layer-toggle" onclick="toggleLayer('business-type-layer')"><img id="business-type-layer" src="../../img/show.png"
+                    style="width: 20px; height: 20px;"></span>
+        </div>
+
+
+    </div>
+    <!-- Removed simplify-control div with the button -->
+
+    <script>
+        // Mapbox access token
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYW54dWUiLCJhIjoiY20zcWw5NmRlMHN4MzJscXU5emlkN2U3aSJ9.OgMgSlL5oOFhzT52-zSoOA';
+
+        let neighborhoodsJson;
+        let yelpGeojsonDatas;
+
+        // Philadelphia city bounds (approximate)
+        const phillyBounds = [
+            [-75.280284, 39.871920], // Southwest coordinates
+            [-74.955710, 40.137992]  // Northeast coordinates
+        ];
+
+        // Business type colors
+        const businessTypeColors = {
+            'Restaurants': '#FF5733',
+            // 'Food': '#C70039',
+            'Bars & Nightlife': '#900C3F',
+            'Shopping': '#581845',
+            'Beauty & Spas': '#FFC300',
+            'Health & Medical': '#DAF7A6',
+            'Home Services': '#2874A6',
+            'Local Services': '#7D3C98',
+            'Automotive': '#2E86C1',
+            'Arts & Entertainment': '#138D75',
+            'Hotels & Travel': '#F1C40F',
+            'Education': '#D35400',
+            'Active Life': '#1ABC9C',
+            'Event Planning & Services': '#F39C12',
+            'Pet Services': '#8E44AD',
+            'Professional Services': '#2C3E50',
+            'Other': '#95A5A6'
+        };
+
+        const ratingOptions = [
+            { value: 'All', label: 'All' },
+            { value: '5', label: '5' },
+            { value: '4.5', label: '4.5' },
+            { value: '4', label: '4' },
+            { value: '3.5', label: '3.5' },
+            { value: '3', label: '3' },
+        ];
+
+
+        // Initialize map
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/anxue/cmaiua4ut010k01r45qpyhja0',
+            center: [-75.1652, 39.9526], // Philadelphia
+            zoom: 12,
+            maxBounds: [
+                [-75.380284, 39.771920], // Southwest coordinates (extended slightly)
+                [-74.855710, 40.237992]  // Northeast coordinates (extended slightly)
+            ]
+        });
+
+
+
+        // Add navigation controls
+        map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+
+        // Initialize map on load
+        map.on('load', async () => {
+            try {
+                map.loadImage('../../img/bike.png', function (error, image) {
+                    if (error) throw error;
+                    map.addImage('bike-marker', image);
+                });
+
+                // load neighborhoods data
+                const response = await fetch('../../geojson/philadelphia-neighborhoods.geojson');
+                neighborhoodsJson = await response.json();
+
+                initNeighborhoodSelect(neighborhoodsJson);
+                initBusinessTypeSelect(businessTypeColors);
+                initRatingSelect(ratingOptions);
+
+                // Create the legend
+                createLegend();
+
+                // Load Yelp data
+                yelpGeojsonDatas = await loadYelpData();
+
+                // Hide loading indicator
+                document.getElementById('loading').style.display = 'none';
+
+
+                // Fetch Philadelphia city boundary for highlighting
+                fetch('https://opendata.arcgis.com/datasets/405ec3da942d4e20869d4e1449a2be48_0.geojson')
+                    .then(response => response.json())
+                    .then(data => {
+                        // Add Philadelphia boundary source
+
+                        map.addSource('philly-boundary', {
+                            type: 'geojson',
+                            data: data
+                        });
+
+                        // Add a faint outline around Philadelphia
+                        map.addLayer({
+                            'id': 'philly-boundary-line',
+                            'type': 'line',
+                            'source': 'philly-boundary',
+                            'layout': {},
+                            'paint': {
+                                'line-color': '#000',
+                                'line-width': 2,
+                                'line-opacity': 0.5
+                            }
+                        });
+                        initOutsideMask(data);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching Philadelphia boundary:', error);
+                    });
+
+
+
+
+                // Add business point sources for each business type
+                Object.keys(businessTypeColors).forEach(type => {
+
+                    addBusinessLayer(type, yelpGeojsonDatas.features.filter(feature =>
+                        feature.properties.businessType === type
+                    ));
+                    setupBusinessInteraction(type);
+                });
+
+
+                // Setup neighborhood interaction
+                setupNeighborhoodInteraction();
+
+                // add bike layer
+                await addBikeLayer();
+
+                // setup business interaction
+                setupBikeInteraction();
+
+                function setupBusinessInteraction(type) {
+                    // Add click event for business popups
+                    map.on('click', `businesses-${type}`, (e) => {
+                        const coordinates = e.features[0].geometry.coordinates.slice();
+                        const properties = e.features[0].properties;
+
+                        // Create popup content
+                        const popupContent = `
+                                <h3>${properties.name}</h3>
+                                <p><strong>Rating:</strong> ${properties.rating} ★ (${properties.review_count} reviews)</p>
+                                <p><strong>Address:</strong> ${properties.address}</p>
+                                <p><strong>Categories:</strong> ${properties.categories}</p>
+                                <p><strong>Type:</strong> ${properties.businessType}</p>
+                                <p><strong>Hours:</strong> ${properties.hours ? (properties.hours).slice(1, -1) : null}</p>
+                            `;
+
+                        // Create popup
+                        new mapboxgl.Popup()
+                            .setLngLat(coordinates)
+                            .setHTML(popupContent)
+                            .addTo(map);
+                    });
+
+                    // Change cursor when hovering over businesses
+                    map.on('mouseenter', `businesses-${type}`, () => {
+                        map.getCanvas().style.cursor = 'pointer';
+                    });
+
+                    map.on('mouseleave', `businesses-${type}`, () => {
+                        map.getCanvas().style.cursor = '';
+                    });
+                }
+                function setupBikeInteraction() {
+                    // Add click event for business popups
+                    map.on('click', `bike-layer`, (e) => {
+                        // console.log('bike-layer', e.features[0]);
+                        // return
+                        const coordinates = e.features[0].geometry.coordinates.slice();
+                        const properties = e.features[0].properties;
+
+                        // Create popup content
+                        const popupContent = `
+                                <h3>${properties.name}</h3>
+                                <p><strong>BikesAvailable:</strong> ${properties.bikesAvailable}</p>
+                                <p><strong>ClassicBikesAvailable:</strong> ${properties.classicBikesAvailable}</p>
+                                <p><strong>SmartBikesAvailable:</strong> ${properties.smartBikesAvailable}</p>
+                                <p><strong>ElectricBikesAvailable:</strong> ${properties.electricBikesAvailable}</p>
+                                <p><strong>RewardBikesAvailable:</strong> ${properties.rewardBikesAvailable}</p>
+                                <p><strong>RewardDocksAvailable:</strong> ${properties.rewardDocksAvailable}</p>
+                                <p><strong>KioskStatus:</strong> ${properties.kioskStatus}</p>
+                                <p><strong>KioskPublicStatus:</strong> ${properties.kioskPublicStatus}</p>
+                                <p><strong>KioskConnectionStatus:</strong> ${properties.kioskConnectionStatus}</p>
+                            `;
+
+                        // Create popup
+                        new mapboxgl.Popup()
+                            .setLngLat(coordinates)
+                            .setHTML(popupContent)
+                            .addTo(map);
+                    });
+
+                    // Change cursor when hovering over businesses
+                    map.on('mouseenter', `bike-layer`, () => {
+                        map.getCanvas().style.cursor = 'pointer';
+                    });
+
+                    map.on('mouseleave', `bike-layer`, () => {
+                        map.getCanvas().style.cursor = '';
+                    });
+                }
+
+            } catch (error) {
+                console.error('Error initializing map:', error);
+            }
+        });
+
+        //set outside mask
+        function initOutsideMask(data) {
+            const global = turf.polygon([[
+                [-180, -90],
+                [-180, 90],
+                [180, 90],
+                [180, -90],
+                [-180, -90]
+            ]])
+            const phillyBoundary = turf.polygon(data.features[0].geometry.coordinates)
+            const difference = turf.difference(global, phillyBoundary)
+            map.addLayer({
+                'id': 'difference-area',
+                'type': 'fill',
+                'source': {
+                    'type': 'geojson',
+                    'data': difference
+                },
+                'paint': {
+                    'fill-color': '#ffffff',
+                    'fill-opacity': 0.7,
+                }
+            });
+
+        }
+        async function addBikeLayer() {
+            const bikeResponse = await fetch('https://bts-status.bicycletransit.workers.dev/phl');
+            const bikeData = await bikeResponse.json();
+            map.addSource('bike-layer', {
+                type: 'geojson',
+                data: bikeData
+            })
+            map.addLayer({
+                "id": "bike-layer",
+                "type": "symbol",
+                "source": "bike-layer",
+                "layout": {
+                    "icon-image": "bike-marker", 
+                    "icon-size": 0.7
+                }
+
+            });
+            console.log('bikeData', bikeData);
+
+        }
+
+
+        // Function to add business layers
+        function addBusinessLayer(type, features) {
+            const filteredFeatures = {
+                type: 'FeatureCollection',
+                features: features
+            };
+
+            // Add source if it doesn't exist
+            if (!map.getSource(`businesses-${type}`)) {
+                map.addSource(`businesses-${type}`, {
+                    type: 'geojson',
+                    data: filteredFeatures
+                });
+            } else {
+                // Update existing source
+                map.getSource(`businesses-${type}`).setData(filteredFeatures);
+            }
+
+            // Add circle layer if it doesn't exist
+            if (!map.getLayer(`businesses-${type}`)) {
+                map.addLayer({
+                    id: `businesses-${type}`,
+                    type: 'circle',
+                    source: `businesses-${type}`,
+                    paint: {
+                        'circle-radius': [
+                            'interpolate',
+                            ['linear'],
+                            ['zoom'],
+                            10, 2,
+                            13, 3,
+                            15, 5,
+                            17, 8,
+                            19, 12
+                        ],
+                        'circle-color': businessTypeColors[type],
+                        'circle-opacity': 0.8,
+                        'circle-stroke-width': 1,
+                        'circle-stroke-color': '#ffffff'
+                    }
+                });
+
+            }
+        }
+
+        // Setup neighborhood interaction
+        function setupNeighborhoodInteraction() {
+            // Add a new layer for neighborhood interaction
+            map.on('mousemove', 'neighborhoods-fill', (e) => {
+                // Change cursor style
+                map.getCanvas().style.cursor = 'pointer';
+
+                // Get the neighborhood properties
+                const properties = e.features[0].properties;
+
+                // Update the neighborhood info box
+                const infoBox = document.getElementById('neighborhood-info');
+                infoBox.innerHTML = `<h3>${properties.name}</h3>`;
+                infoBox.style.display = 'block';
+            });
+
+            map.on('mouseleave', 'neighborhoods-fill', () => {
+                map.getCanvas().style.cursor = '';
+                document.getElementById('neighborhood-info').style.display = 'none';
+            });
+
+            // Add click interaction for neighborhood zoom
+            map.on('click', 'neighborhoods-fill', (e) => {
+                // Get the neighborhood geometry
+                const bbox = turf.bbox(e.features[0].geometry);
+
+                // Zoom to the neighborhood
+                map.fitBounds(bbox, {
+                    padding: 100
+                });
+            });
+        }
+
+
+        // filter by condition
+        function filterByCondition() {
+            const selectedNeighborhood = document.querySelector('#neighborhood-select').value;
+            const selectedType = document.querySelector('#business-type-select').value;
+            const selectedRating = document.querySelector('#rating-select').value;
+
+            showHighLightNeighborhood(selectedNeighborhood);
+            const img = document.getElementById(`business-type-layer`);
+            let isShow = img.src.includes('show.png');
+            if(!isShow){
+                img.src = img.src.replace('hide.png', 'show.png');
+            }
+            
+            Object.keys(businessTypeColors).forEach(type => {
+                const layerId = `businesses-${type}`;
+
+                if (map.getLayer(layerId)) {
+                    const isVisible = selectedType === 'All' || type === selectedType;
+                    map.setLayoutProperty(layerId, 'visibility', isVisible ? 'visible' : 'none');
+                    if (isVisible) {
+                        const filters = [
+                            feature => feature.properties.businessType === type,
+                            selectedRating !== 'All' ?
+                                feature => feature.properties.rating >= parseFloat(selectedRating) :
+                                null
+                        ].filter(Boolean);
+
+                        const filteredFeatures = yelpGeojsonDatas.features.filter(feature =>
+                            filters.every(filter => filter(feature))
+                        );
+
+                        addBusinessLayer(type, filteredFeatures);
+                    }
+                }
+            });
+        }
+
+        // show high light neighborhood
+        async function showHighLightNeighborhood(selectedValue) {
+            if (map.getLayer('filtered-neighborhoods')) {
+                map.removeLayer('filtered-neighborhoods');
+            }
+
+            if (selectedValue === 'All') {
+                map.flyTo({
+                    zoom: 12,
+                    center: [-75.1652, 39.9526]
+                })
+                return;
+            }
+            let originalData = neighborhoodsJson;
+            const res = neighborhoodsJson.features.filter(feature => feature.properties.LISTNAME !== selectedValue);
+            const selectedNeighborhood = neighborhoodsJson.features.find(feature => feature.properties.LISTNAME === selectedValue);
+            const center = getCenter(selectedNeighborhood.geometry);
+            const filteredNeighborhoods = {
+                type: 'FeatureCollection',
+                features: res
+            };
+            if (!map.getSource(`filtered-neighborhoods`)) {
+                map.addSource("filtered-neighborhoods", {
+                    type: 'geojson',
+                    data: filteredNeighborhoods
+                })
+            } else {
+                // Update existing source
+                map.getSource(`filtered-neighborhoods`).setData(filteredNeighborhoods);
+            }
+            map.addLayer({
+                id: 'filtered-neighborhoods',
+                type: 'fill',
+                source: 'filtered-neighborhoods',
+                paint: {
+                    'fill-color': '#5738d7',
+                    'fill-opacity': 0.3,
+                    'fill-outline-color': '#000',
+                }
+            });
+            // fly to the selected neighborhood
+            map.flyTo({
+                zoom: 14,
+                // pitch: 90,
+                center: [center.geometry.coordinates[0], center.geometry.coordinates[1]]//中心点
+            })
+
+        }
+
+        function toggleLayer(layerId) {
+            const img = document.getElementById(`${layerId}`);
+            let isShow = img.src.includes('show.png');
+            if (isShow) {
+                img.src = img.src.replace('show.png', 'hide.png');
+            } else {
+                img.src = img.src.replace('hide.png', 'show.png');
+            }
+            const layer = map.getLayer(layerId);
+            if (layerId === 'bike-layer') {
+                map.setLayoutProperty('bike-layer', 'visibility', isShow ? 'none' : 'visible');
+            }
+            if (layerId === 'business-type-layer') {
+                Object.keys(businessTypeColors).forEach(type => {
+                    map.setLayoutProperty(`businesses-${type}`, 'visibility', isShow ? 'none' : 'visible');
+                });
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>

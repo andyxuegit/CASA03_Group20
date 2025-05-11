@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Philadelphia Maps Collection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #002147;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            width: 95%;
+            max-width: 1800px;
+            margin: 50px auto;
+            display: flex;
+            flex-direction: column;
+            /* background: #fff; */
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-title {
+            color: white;
+            margin: 10px 0 20px 10px;
+            font-size: 28px;
+            font-weight: 500;
+        }
+
+        .maps-container {
+            display: flex;
+            height: 800px;
+        }
+
+        .info-panel {
+            width: 23%;
+            padding: 25px;
+            background: #fff;
+            overflow-y: auto;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .info-panel h1 {
+            margin: 0 0 20px 0;
+            font-size: 24px;
+            color: #0a2240;
+            font-weight: 500;
+        }
+
+        .info-panel p {
+            line-height: 1.7;
+            color: #444;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+
+        .maps-section {
+            width: 75%;
+            display: flex;
+            position: relative;
+        }
+
+        .map-container {
+            width: 50%;
+            position: relative;
+        }
+
+        .map-title {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .footer {
+            background-color: #ffffff3d;
+            padding: 0 10px;
+            text-align: center;
+            color: white;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+            margin: 0;
+        }
+
+
+
+        .info-panel p:last-child {
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 1200px) {
+            .maps-container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .info-panel,
+            .maps-section {
+                width: 100%;
+            }
+
+            .info-panel {
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+                padding: 20px;
+            }
+
+            .maps-section {
+                height: 500px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .maps-section {
+                flex-direction: column;
+                height: 800px;
+            }
+
+            .map-container {
+                width: 100%;
+                height: 50%;
+            }
+        }
+        .data-source {
+            color: #000;
+        }
+
+        
+    </style>
+</head>
+
+<body>
+    <!-- <h2 class="page-title">Bikeshare Station Networks VS Business Networks</h2> -->
+
+    <div class="container">
+        <div class="maps-container">
+            <div class="info-panel">
+                <h1>Bikeshare Station Networks VS Business Networks</h1>
+                <p>There are currently 264 bikeshare docking stations and over 14,000 businesses in Philadelphia.</p>
+                <p>Bikeshare stations are mainly located in the city centre and surrounding neighbourhoods, reflecting
+                    that the bikesharing network mainly caters to short-distance trips in the city centre and nearby
+                    areas. </p>
+                <p>Businesses are more densely distributed throughout the city, covering a wider area.</p>
+                <p>Both the bikeshare and business networks have significant high-density clustering in the city centre,
+                    suggesting that the city centre is both a core of business activity and cycle trips.</p>
+                    <p>
+                        <strong>Data source:</strong> 
+                        <a class="data-source" target="_blank" href="https://business.yelp.com/data/resources/open-dataset/">Open Dataset | Yelp Data Licensing</a>,
+                        <a class="data-source" target="_blank" href="https://www.rideindego.com/about/data/">Data - Indego</a>
+                    </p>
+            </div>
+
+            <div class="maps-section">
+                <div class="map-container">
+                    <div class="map-title">Philadelphia Bike Heat Map</div>
+                    <iframe id="bike-heat-map" src="bike-heat-map.html"></iframe>
+                </div>
+                <div class="map-container">
+                    <div class="map-title">Philadelphia Business Heat Map</div>
+                    <iframe id="business-heat-map" src="business-heat-map.html"></iframe>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="footer">
+            <p><strong>Data source:</strong> Open Dataset | Yelp Data Licensing, Data – Indego</p>
+        </div> -->
+
+    </div>
+
+    <script>
+       
+        document.addEventListener('DOMContentLoaded', function () {
+           
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                iframe.onload = function () {
+                    console.log('Map iframe loaded successfully');
+                };
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Philadelphia Business Map</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #002147;
+    }
+
+    /* 封面页样式 */
+    #cover-page {
+      width: 100%;
+      height: 100vh;
+      background-image: url('./img/bg.png');  /* ✅ 请确保路径正确 */
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cover-content {
+      text-align: center;
+      color: #333;
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 40px 60px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .cover-content h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+    }
+
+    .cover-content p {
+      font-size: 1.5em;
+      margin-bottom: 30px;
+      color: #666;
+    }
+
+    .start-button {
+      display: inline-block;
+      padding: 12px 30px;
+      background-color: #e8edf5;
+      color: #2e4f7d;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 1.2em;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .start-button:hover {
+      background-color: #2e4f7d;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* 菜单栏样式 */
+    #menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: white;
+      padding: 10px 0;
+      margin: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    #menu li {
+      list-style: none;
+    }
+
+    #menu a {
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+
+    #menu a:hover,
+    #menu a.active {
+      background-color: #2e4f7d;
+      color: white;
+    }
+
+    .section {
+      margin-top: 60px;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100vh;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ✅ 封面页 -->
+<div id="cover-page">
+  <div class="cover-content">
+    <h1>Philadelphia's Bikeshare and Business Network</h1>
+    <p>CASA0003 Group 20</p>
+    <a href="#intro" class="start-button">Get Started</a>
+  </div>
+</div>
+
+<!-- ✅ 主导航菜单 -->
+<ul id="menu">
+  <li><a href="#intro">Introduction</a></li>
+  <li><a href="#motivation">Motivation</a></li>
+  <li><a href="#heatmap">Heat Map</a></li>
+  <li><a href="#flowmap">Trip Flow Map</a></li>
+  <li><a href="#chart">Trip Chart</a></li>
+  <li><a href="#choro1">Choropleth Map</a></li>
+  <li><a href="#choro2">Buffer Zone Map</a></li>
+  <li><a href="#scatterplot">Scatter Plot</a></li>
+  <li><a href="#app">Application</a></li>
+  <li><a href="#conclusion">Conclusion</a></li>
+  <li><a href="#references">References</a></li>
+  <li><a href="#about">About</a></li>
+</ul>
+
+<!-- ✅ 各子页面 iframe -->
+<div class="section" id="intro"><iframe src="./intro/intro.html"></iframe></div>
+<div class="section" id="motivation"><iframe src="./motivation/motivation.html"></iframe></div>
+<div class="section" id="heatmap"><iframe src="./heat-map/heat-map.html"></iframe></div>
+<div class="section" id="flowmap"><iframe src="./flow/flow.html"></iframe></div>
+<div class="section" id="chart"><iframe src="./chart/chart.html"></iframe></div>
+<div class="section" id="choro1"><iframe src="./choro1/choro1.html"></iframe></div>
+<div class="section" id="choro2"><iframe src="./choropleth_html/choropleth-map/choropleth-map.html"></iframe></div>
+<div class="section" id="scatterplot"><iframe src="./scatter-plot-map/scatter-plot-map.html"></iframe></div>
+<div class="section" id="app"><iframe src="./app/html/filter-map/filter-map.html"></iframe></div>
+<div class="section" id="conclusion"><iframe src="./conclusion/conclusion.html"></iframe></div>
+<div class="section" id="references"><iframe src="./references/references.html"></iframe></div>
+<div class="section" id="about"><iframe src="./about/about1.html"></iframe></div>
+
+<!-- ✅ JS 滚动和菜单高亮 -->
+<script>
+  const links = document.querySelectorAll('#menu a');
+  const sections = document.querySelectorAll('.section');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(section => {
+      const rect = section.getBoundingClientRect();
+      if (rect.top <= 100 && rect.bottom >= 100) {
+        current = section.id;
+      }
+    });
+    links.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === '#' + current) {
+        link.classList.add('active');
+      }
+    });
+  });
+
+  links.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const targetId = link.getAttribute('href').substring(1);
+      document.getElementById(targetId).scrollIntoView({
+        behavior: 'smooth'
+      });
+    });
+  });
+</script>
+
+</body>
+</html>

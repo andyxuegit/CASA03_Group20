@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Philadelphia Census Tract Visualization</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet">
+    <link href="choro1.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+    <div class="map-wrapper">
+        <div id="map"></div>
+        <div class="layer-toggle">
+            <strong>Toggle Layers</strong><br>
+            <input type="radio" name="layer" id="population" checked> <label for="population">Population Density</label><br>
+            <input type="radio" name="layer" id="businesses"> <label for="businesses">Business Count</label><br>
+            <input type="radio" name="layer" id="income"> <label for="income">Median Income</label><br>
+            <input type="radio" name="layer" id="whites"> <label for="whites">White Population Proportion</label><br><br>
+            <input type="checkbox" id="toggle-bikeshare" checked> <label for="toggle-bikeshare">Show Bikeshare Stations</label>
+        </div>
+        <div class="sidebar" id="legend">
+            <!-- 图例内容注入 -->
+        </div>
+    </div>
+    <div class="description-text">
+    <h2>Distribution of Bikeshare Stations with Socioeconomic Characteristics</h2>
+    <p>
+       Population density is higher in the outer area, especially the north of Philadelphia, than in the city centre. However, bikeshare stations are predominantly located in the city centre and to the west and south of the city centre. Not only the median annual household income but also the white population proportion are relatively higher in the city centre and south city. The area north to the city centre, with a low median household income, has a relatively sparse number of bikeshare stations. Despite the lower median income and higher number of bikeshare stations on the east side of the city, this area has two universities, which means that these users are mostly students instead of real disadvantaged people (Caspi, 2023).
+    </p>
+                    <p><strong>Data source:</strong>
+                        <a class="data-source" target="_blank" href="https://www.rideindego.com/about/data/">Data - Indego</a>, 
+                        <a class="data-source" target="_blank" href="https://data.census.gov/">Census Bureau Data</a>, 
+                        <a class="data-source" target="_blank" href="https://business.yelp.com/data/resources/open-dataset/">Open Dataset | Yelp Data Licensing</a>
+                    </p>
+    </div>
+</div>
+
+<script src="https://api.tiles.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoiYW54dWUiLCJhIjoiY20zcWw5NmRlMHN4MzJscXU5emlkN2U3aSJ9.OgMgSlL5oOFhzT52-zSoOA';
+
+const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/anxue/cmacfdla500nw01skh1152nq5',
+    center: [-75.1652, 39.9526],
+    zoom: 11
+});
+
+map.on('load', () => {
+    map.addSource('census_tracts', {
+        type: 'geojson',
+        data: 'census_tracts_population_businesses.geojson'
+    });
+    map.addSource('income_tracts', {
+        type: 'geojson',
+        data: 'census_tracts_income_businesses.geojson'
+    });
+    map.addSource('whites_tracts', {
+        type: 'geojson',
+        data: 'Census_Tracts_2010_with_proportion_neighbor_closest.geojson'
+    });
+    map.addSource('bikeshare', {
+        type: 'geojson',
+        data: 'phl.json'
+    });
+
+    // Population Density Layer
+    map.addLayer({
+        id: 'population-layer',
+        type: 'fill',
+        source: 'census_tracts',
+        paint: {
+            'fill-color': [
+                'interpolate',
+                ['linear'],
+                ['get', 'B01003_001E'],
+                0, '#dcd6e6',
+                2000, '#a99ecf',
+                4000, '#7d6fb9',
+                6000, '#5b4c99',
+                8000, '#3b2070'
+            ],
+            'fill-opacity': 0.7,
+            'fill-outline-color': '#ccc'
+        }
+    });
+
+    // Business Count Layer
+    map.addLayer({
+        id: 'business-layer',
+        type: 'fill',
+        source: 'census_tracts',
+        layout: { visibility: 'none' },
+        paint: {
+            'fill-color': [
+                'interpolate',
+                ['linear'],
+                ['get', 'business_count'],
+                0, '#cfe9cd',
+                10, '#92d193',
+                30, '#48a858',
+                60, '#1c7e3c',
+                100, '#004718'
+            ],
+            'fill-opacity': 0.7,
+            'fill-outline-color': '#ccc'
+        }
+    });
+
+    // Median Income Layer
+    map.addLayer({
+        id: 'income-layer',
+        type: 'fill',
+        source: 'income_tracts',
+        layout: { visibility: 'none' },
+        paint: {
+            'fill-color': [
+                'interpolate',
+                ['linear'],
+                ['get', 'S1903_C03_001E'],
+                0, '#fee5d9',
+                40000, '#fcae91',
+                60000, '#fb6a4a',
+                80000, '#de2d26',
+                100000, '#a50f15'
+            ],
+            'fill-opacity': 0.7,
+            'fill-outline-color': '#ccc'
+        }
+    });
+
+    // White Population Proportion Layer (蓝色色谱)
+    map.addLayer({
+        id: 'whites-layer',
+        type: 'fill',
+        source: 'whites_tracts',
+        layout: { visibility: 'none' },
+        paint: {
+            'fill-color': [
+                'interpolate',
+                ['linear'],
+                ['get', 'proportion'],
+                0, '#deebf7',
+                20, '#9ecae1',
+                40, '#6baed6',
+                60, '#3182bd',
+                80, '#08519c'
+            ],
+            'fill-opacity': 0.7,
+            'fill-outline-color': '#ccc'
+        }
+    });
+
+    // Bikeshare Station Layer
+    map.addLayer({
+        id: 'bikeshare-layer',
+        type: 'circle',
+        source: 'bikeshare',
+        paint: {
+            'circle-radius': 4,
+            'circle-color': '#000000',
+            'circle-opacity': 0.8
+        }
+    });
+
+    updateLegend('population');
+
+    document.getElementById('population').addEventListener('change', () => {
+        toggleLayers('population-layer');
+        updateLegend('population');
+    });
+    document.getElementById('businesses').addEventListener('change', () => {
+        toggleLayers('business-layer');
+        updateLegend('businesses');
+    });
+    document.getElementById('income').addEventListener('change', () => {
+        toggleLayers('income-layer');
+        updateLegend('income');
+    });
+    document.getElementById('whites').addEventListener('change', () => {
+        toggleLayers('whites-layer');
+        updateLegend('whites');
+    });
+
+    document.getElementById('toggle-bikeshare').addEventListener('change', (e) => {
+        const visibility = e.target.checked ? 'visible' : 'none';
+        map.setLayoutProperty('bikeshare-layer', 'visibility', visibility);
+    });
+
+    function toggleLayers(visibleLayer) {
+        const layers = ['population-layer', 'business-layer', 'income-layer', 'whites-layer'];
+        layers.forEach(layer => {
+            const visibility = (layer === visibleLayer) ? 'visible' : 'none';
+            map.setLayoutProperty(layer, 'visibility', visibility);
+        });
+    }
+});
+
+function updateLegend(layer) {
+    const legend = document.getElementById('legend');
+    let title = '';
+    let colors = [];
+    let labels = [];
+
+    if (layer === 'population') {
+        title = 'Population Density (ppl/km2)';
+        colors = ['#dcd6e6', '#a99ecf', '#7d6fb9', '#5b4c99', '#3b2070'];
+        labels = ['0 - 2,000', '2,000 - 4,000', '4,000 - 6,000', '6,000 - 8,000', '> 8,000'];
+    } else if (layer === 'businesses') {
+        title = 'Business Number';
+        colors = ['#cfe9cd', '#92d193', '#48a858', '#1c7e3c', '#004718'];
+        labels = ['0 - 10', '10 - 30', '30 - 60', '60 - 100', '> 100'];
+    } else if (layer === 'income') {
+        title = 'Median Household Income';
+        colors = ['#fee5d9', '#fcae91', '#fb6a4a', '#de2d26', '#a50f15'];
+        labels = ['0 - 40,000', '40,000 - 60,000', '60,000 - 80,000', '80,000 - 100,000', '> 100,000'];
+    } else if (layer === 'whites') {
+        title = 'White Population Proportion (%)';
+        colors = ['#deebf7', '#9ecae1', '#6baed6', '#3182bd', '#08519c'];
+        labels = ['0 - 20%', '20 - 40%', '40 - 60%', '60 - 80%', '80 - 100%'];
+    }
+
+    let html = `
+        <div class="legend-title">
+            <span>${title}</span>
+            <span>👁️</span>
+        </div>
+    `;
+
+    colors.forEach((color, i) => {
+        html += `
+            <div class="legend-item">
+                <div class="legend-color" style="background:${color}"></div>
+                <span>${labels[i]}</span>
+            </div>
+        `;
+    });
+
+    html += `
+        <div class="legend-title" style="margin-top:10px;">
+            <span>Bikeshare Stations</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-point"></div>
+            <span>Station</span>
+        </div>
+    `;
+
+    legend.innerHTML = html;
+}
+</script>
+
+</body>
+</html>

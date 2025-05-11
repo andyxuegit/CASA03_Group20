@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>scatter-plot-map</title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: #002147;
+        }
+
+        #container {
+            width: 65vw;
+            height: 98%;
+            /* background: #002147; */
+            padding: 50px;
+            box-sizing: border-box;
+        }
+
+        .info-panel {
+            position: absolute;
+            top: 50px;
+            right: 50px;
+            width: 30vw;
+            height: 500px;
+            border: 1px solid #E0E0E0;
+            border-radius: 8px;
+            padding: 25px;
+            box-sizing: border-box;
+            color: #E0E0E0;
+            overflow-y: auto;
+            background-color: rgba(0, 33, 71, 0.7);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .info-panel:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .info-panel h2 {
+            color: #f0a538;
+            margin-top: 0;
+            border-bottom: 1px solid #E0E0E0;
+            padding-bottom: 15px;
+            font-size: 22px;
+            letter-spacing: 0.5px;
+        }
+
+        .info-panel p {
+            line-height: 1.8;
+            margin-bottom: 18px;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+        }
+
+        .info-panel strong {
+            color: #f0a538;
+            font-weight: 600;
+        }
+
+        .tool-toolbar {
+            position: absolute;
+            right: 50px;
+            bottom: 80px;
+            z-index: 1001;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 15px;
+            background-color: rgba(0, 33, 71, 0.7);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .tool-toolbar button {
+            font-size: 15px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #fff;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-toolbar button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.5s ease;
+        }
+
+        .tool-toolbar button:hover {
+            background: #f0a538;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .tool-toolbar button:hover:before {
+            left: 100%;
+        }
+
+        .tool-toolbar button.selected {
+            background: #f0a538;
+            color: #002147;
+            border: 1px solid #f0a538;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            font-weight: 600;
+        }
+        .data-source {
+            color: #fff;
+          
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container"></div>
+    <div class="info-panel">
+        <h2>Scatter plot</h2>
+        <div id="info-content">
+            <p>The business density, annual median household income, and the white population proportion within the
+                station's service buffer zone all show a positive correlation with the total annual trips of the docking
+                station, suggesting that people in areas with higher business density, income, and white population tend
+                to use shared bikes more frequently. </p>
+            <p>Caspi & Noland (2019) also found that docking stations in high-income areas generated more trips in
+                Philadelphia, and Caspi (2023) found a positive correlation between white population proportion and trip
+                numbers in Philadelphia. </p>
+            <p>There is a weak negative correlation between population density and the number of trips.</p>
+            <p><strong>Data source:</strong>
+                <a class="data-source" target="_blank" href="https://www.rideindego.com/about/data/">Data - Indego</a>,
+                <a class="data-source" target="_blank" href="https://data.census.gov/">Census Bureau Data</a>,
+                <a class="data-source" target="_blank"
+                    href="https://business.yelp.com/data/resources/open-dataset/">Open Dataset | Yelp Data Licensing</a>
+            </p>
+        </div>
+    </div>
+    <div class="tool-toolbar">
+        <button id="businessDensity">Business Density</button>
+        <button id="populationDensity">Population Density</button>
+        <button id="medianIncome">Median Income</button>
+        <button id="whiteProportion">white Proportion</button>
+    </div>
+    <script type="module">
+        const trendLines = {
+            'businessDensity': {
+                slope: 6.1522,
+                intercept: 7590.6839
+            },
+            'populationDensity': {
+                slope: -0.0008,
+                intercept: 10574.0757
+            },
+            'medianIncome': {
+                slope: 0.0816,
+                intercept: 2945.6735
+            },
+            'whiteProportion': {
+                slope: 173.78,
+                intercept: 1187.18
+            },
+        }
+
+
+
+        const differentDataSets = await initDifferentData();
+        document.querySelectorAll('.tool-toolbar button').forEach(button => {
+            button.addEventListener('click', () => selectTool(button.id));
+        });
+        //默认选中businessDensity
+        selectTool('businessDensity');
+
+        async function initDifferentData() {
+            const response = await fetch('../scatter-plot-map/geojson/bike_buffer_wgs84.geojson');
+            const response2 = await fetch('../scatter-plot-map/geojson/service_area_proportion_surface_wgs84.geojson');
+            const dataSets = {
+                'businessDensity': [],
+                'populationDensity': [],
+                'medianIncome': [],
+                'whiteProportion': [],
+            }
+            const mergedServiceAreasData = await response.json();
+            const proportionData = await response2.json();
+            mergedServiceAreasData.features.forEach((feature, index) => {
+                dataSets['businessDensity'].push([feature.properties.business_density, feature.properties.total_trips]);
+                dataSets['populationDensity'].push([feature.properties.population_density, feature.properties.total_trips]);
+                dataSets['medianIncome'].push([feature.properties.median_income, feature.properties.total_trips]);
+                dataSets['whiteProportion'].push([proportionData.features[index].properties.proportion, feature.properties.total_trips]);
+            });
+            return dataSets;
+        }
+        function getTrendLine(type) {
+            const trendLine = trendLines[type];
+            const minX = 0;
+            let maxX = 0;
+            if (type == 'businessDensity') {
+                maxX = 5000;
+            } else if (type == 'populationDensity') {
+                maxX = 3000000;
+            } else if (type == 'medianIncome') {
+                maxX = 250000;
+            } else if (type == 'whiteProportion') {
+                maxX = 100;
+            }
+            const minY = trendLine.slope * minX + trendLine.intercept;
+            const maxY = trendLine.slope * maxX + trendLine.intercept;
+            return [
+                [minX, minY],
+                [maxX, maxY]
+            ]
+        }
+        async function selectTool(type) {
+            // remove all selected buttons
+            const buttons = document.querySelectorAll('.tool-toolbar button');
+            buttons.forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            const titles = {
+                businessDensity: 'Trip Volume vs Business Density<br>y = 6.1522x + 7590.6839',
+                populationDensity: 'Trip Volume vs Population Density<br>y = -0.0008x + 10574.0757',
+                medianIncome: 'Trip Volume vs Median Income<br>y = 0.0816x + 2945.6735',
+                whiteProportion: 'Trip Volume vs White Proportion<br>y = 173.78x + 1187.18',
+            }
+            // add selected effect to the current selected button
+            const button = document.getElementById(type);
+            button.classList.add('selected');
+
+            //set highcharts chart
+            //set background color
+            Highcharts.chart('container', {
+                chart: {
+                    backgroundColor: 'transparent',
+                    animation: true,
+                    style: {
+                        fontFamily: "Arial, sans-serif"
+                    }
+                },
+                //hide title
+                title: {
+                    text: '',
+                },
+                legend: {
+                    enabled: false
+                },
+                tooltip: {
+                    formatter: function () {
+                        return `<b>${this.series.name}:</b> ${this.x.toFixed(2)}<br/>
+                <b>Total Trips:</b> ${this.y.toFixed(2)}`;
+                    },
+                    backgroundColor: 'rgba(0, 33, 71, 0.85)',
+                    borderColor: '#f0a538',
+                    borderRadius: 8,
+                    style: {
+                        color: '#E0E0E0'
+                    }
+                },
+                xAxis: {
+                    gridLineWidth: 1,        // add grid line
+                    gridLineDashStyle: 'dash',
+                    gridLineColor: '#E0E0E0', // grid line color
+                    tickLength: 5,           // tick line length
+                    lineColor: '#E0E0E0',    // axis line color
+                    title: {
+                        text: type,
+                        style: {
+                            color: '#E0E0E0',
+                            fontSize: '14px'
+                        }
+                    },
+                    labels: {
+                        style: {
+                            color: '#E0E0E0'
+                        }
+                    }
+                },
+                yAxis: {
+                    gridLineWidth: 1,        // add grid line
+                    gridLineDashStyle: 'dash',
+                    gridLineColor: '#E0E0E0', // grid line color
+                    tickLength: 5,           // tick line length
+                    lineColor: '#E0E0E0',    // axis line color
+                    title: {
+                        text: 'Total Trips',
+                        style: {
+                            color: '#E0E0E0',
+                            fontSize: '14px'
+                        }
+                    },
+                    labels: {
+                        style: {
+                            color: '#E0E0E0'
+                        }
+                    }
+                },
+                plotOptions: {
+                    scatter: {
+                        animation: {
+                            duration: 1000
+                        }
+                    },
+                    line: {
+                        animation: {
+                            duration: 1500
+                        }
+                    }
+                },
+                series: [{
+                    type: 'line',
+                    name: 'Trend Line',
+                    data: getTrendLine(type),
+                    marker: {
+                        enabled: true,
+                        symbol: 'square',
+                        color: '#f0a538',
+                    },
+                    lineWidth: 5,
+                    color: '#f0a538',
+                    states: {
+                        hover: {
+                            lineWidth: 0
+                        }
+                    },
+                    enableMouseTracking: false
+                }, {
+                    type: 'scatter',
+                    name: type,
+                    data: differentDataSets[type],
+                    marker: {
+                        radius: 5,
+                        symbol: 'circle',
+                        fillColor: 'rgba(240, 165, 56, 0.7)',
+
+                    },
+                    states: {
+                        hover: {
+                            marker: {
+                                radius: 7,
+                                fillColor: '#f0a538'
+                            }
+                        }
+                    }
+                }]
+            });
+        }
+    </script>
+</body>
+
+</html>
