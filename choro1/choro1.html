@@ -14,11 +14,11 @@
         <div id="map"></div>
         <div class="layer-toggle">
             <strong>Toggle Layers</strong><br>
-            <input type="radio" name="layer" id="population" checked> <label for="population">Population Density</label><br>
-            <input type="radio" name="layer" id="businesses"> <label for="businesses">Business Count</label><br>
-            <input type="radio" name="layer" id="income"> <label for="income">Median Income</label><br>
-            <input type="radio" name="layer" id="whites"> <label for="whites">White Population Proportion</label><br><br>
-            <input type="checkbox" id="toggle-bikeshare" checked> <label for="toggle-bikeshare">Show Bikeshare Stations</label>
+            <input type="radio" name="layer" id="population" checked> <label for="population">PopulationDensity</label><br>
+            <input type="radio" name="layer" id="businesses"> <label for="businesses">BusinessNumber</label><br>
+            <input type="radio" name="layer" id="income"> <label for="income">MedianIncome</label><br>
+            <input type="radio" name="layer" id="whites"> <label for="whites">WhiteProportion</label><br><br>
+            <input type="checkbox" id="toggle-bikeshare" checked> <label for="toggle-bikeshare">ShowBikeshareStations</label>
         </div>
         <div class="sidebar" id="legend">
             <!-- 图例内容注入 -->
@@ -205,19 +205,19 @@ function updateLegend(layer) {
     let labels = [];
 
     if (layer === 'population') {
-        title = 'Population Density (ppl/km2)';
+        title = 'PopulationDensity(ppl/km2)';
         colors = ['#dcd6e6', '#a99ecf', '#7d6fb9', '#5b4c99', '#3b2070'];
         labels = ['0 - 2,000', '2,000 - 4,000', '4,000 - 6,000', '6,000 - 8,000', '> 8,000'];
     } else if (layer === 'businesses') {
-        title = 'Business Number';
+        title = 'BusinessNumber';
         colors = ['#cfe9cd', '#92d193', '#48a858', '#1c7e3c', '#004718'];
         labels = ['0 - 10', '10 - 30', '30 - 60', '60 - 100', '> 100'];
     } else if (layer === 'income') {
-        title = 'Median Household Income';
+        title = 'MedianIncome';
         colors = ['#fee5d9', '#fcae91', '#fb6a4a', '#de2d26', '#a50f15'];
         labels = ['0 - 40,000', '40,000 - 60,000', '60,000 - 80,000', '80,000 - 100,000', '> 100,000'];
     } else if (layer === 'whites') {
-        title = 'White Population Proportion (%)';
+        title = 'WhiteProportion(%)';
         colors = ['#deebf7', '#9ecae1', '#6baed6', '#3182bd', '#08519c'];
         labels = ['0 - 20%', '20 - 40%', '40 - 60%', '60 - 80%', '80 - 100%'];
     }
