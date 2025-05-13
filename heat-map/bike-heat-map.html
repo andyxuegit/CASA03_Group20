@@ -22,7 +22,7 @@
     <div id="map"></div>
  
     <div class="continuous-legend">
-        <div class="legend-title">Bike Heat Map</div>
+        <div class="legend-title">Bikeshare Stations Heat Map</div>
         <div class="legend-bar"></div>
         <div class="legend-labels">
             <span>Low</span>
@@ -113,13 +113,7 @@
                 "source": "bike-heat-layer",
                 // maxzoom: 15,
                 paint: {
-                    'heatmap-weight': [
-                        'interpolate',
-                        ['linear'],
-                        ['get', 'bikesAvailable'],
-                        0, 0,
-                        10, 1
-                    ],
+                    'heatmap-weight': 1,
                     'heatmap-radius': [
                         'interpolate',
                         ['linear'],
