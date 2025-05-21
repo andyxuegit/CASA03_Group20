@@ -154,7 +154,6 @@ body {
     color: #333;
 }
 
-/* 弹出窗口样式 */
 .mapboxgl-popup-content {
     padding: 15px;
     border-radius: 8px;
@@ -171,7 +170,6 @@ body {
     color: #002147;
 }
 
-/* 地图控件样式 */
 .mapboxgl-ctrl-group {
     border-radius: 8px;
     overflow: hidden;
@@ -183,7 +181,6 @@ body {
     height: 36px;
 }
 
-/* 响应式调整 */
 @media (max-width: 768px) {
     .content-wrapper {
         flex-direction: column;
