@@ -32,6 +32,16 @@
       height: 100%;
     }
 
+    #text_canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 11;
+    }
+
     #sidebar {
       position: absolute;
       top: 20px;
@@ -47,18 +57,18 @@
       transition: all 0.3s ease;
     }
 
-    #station-info {
+    #station_info {
       margin-top: 15px;
     }
 
-    #station-title {
+    #station_title {
       font-weight: bold;
       margin-bottom: 10px;
       font-size: 18px;
       color: #222;
     }
 
-    .chart-container {
+    .chart_container {
       margin-top: 25px;
       background-color: #f9f9f9;
       border-radius: 6px;
@@ -66,7 +76,7 @@
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
 
-    .chart-title {
+    .chart_title {
       font-weight: 600;
       margin-bottom: 10px;
       font-size: 14px;
@@ -90,13 +100,13 @@
       padding-right: 30px;
     }
 
-    .select-container {
+    .select_container {
       position: relative;
       width: 100%;
     }
 
-    .select-container::after {
-      content: "\F282"; /* Bootstrap down icon */
+    .select_container::after {
+      content: "\F282";
       font-family: "bootstrap-icons";
       position: absolute;
       right: 10px;
@@ -132,21 +142,21 @@
       color: #333;
     }
 
-    .legend-item {
+    .legend_item {
       display: flex;
       align-items: center;
       margin-bottom: 8px;
       font-size: 13px;
     }
 
-    .legend-color {
+    .legend_color {
       width: 24px;
       height: 8px;
       margin-right: 10px;
       border-radius: 2px;
     }
 
-    .info-panel {
+    .info_panel {
       background-color: white;
       border-radius: 6px;
       padding: 15px;
@@ -179,7 +189,7 @@
       cursor: not-allowed;
     }
 
-    #title-bar {
+    #title_bar {
       position: absolute;
       top: 20px;
       left: 20px;
@@ -191,30 +201,30 @@
       max-width: 400px;
     }
 
-    #title-bar h1 {
+    #title_bar h1 {
       margin: 0;
       font-size: 24px;
       color: #333;
       font-weight: 600;
     }
 
-    #title-bar p {
+    #title_bar p {
       margin: 8px 0 0 0;
       font-size: 16px;
       color: #666;
     }
     
-    #title-bar a {
+    #title_bar a {
       color: #4285f4;
       text-decoration: none;
       font-weight: 500;
     }
     
-    #title-bar a:hover {
+    #title_bar a:hover {
       text-decoration: underline;
     }
     
-    #panel-toggle {
+    #panel_toggle {
       position: absolute;
       top: 130px;
       left: 20px;
@@ -233,11 +243,11 @@
       transition: background-color 0.2s;
     }
     
-    #panel-toggle i {
+    #panel_toggle i {
       margin-right: 8px;
     }
     
-    #panel-toggle:hover {
+    #panel_toggle:hover {
       background-color: #3367d6;
     }
     
@@ -256,7 +266,7 @@
       display: none;
     }
 
-    .chart-tooltip {
+    .chart_tooltip {
       position: absolute;
       background-color: rgba(33, 33, 33, 0.9);
       color: white;
@@ -271,7 +281,7 @@
       line-height: 1.4;
     }
     
-    .month-selector {
+    .month_selector {
       display: flex;
       align-items: center;
       margin-bottom: 20px;
@@ -281,11 +291,11 @@
       border: 1px solid #dde6f1;
     }
     
-    .month-selector h3 {
+    .month_selector h3 {
       margin-right: 12px;
     }
     
-    .month-selector h3 {
+    .month_selector h3 {
       margin: 0;
       font-size: 14px;
       color: #444;
@@ -293,7 +303,7 @@
       white-space: nowrap;
     }
     
-    .month-selector select {
+    .month_selector select {
       margin: 0;
       flex-grow: 1;
     }
@@ -313,12 +323,12 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
     
-    .loading-text {
+    .loading_text {
       display: flex;
       align-items: center;
     }
     
-    .loading-text .spinner {
+    .loading_text .spinner {
       margin-right: 12px;
     }
     
@@ -337,7 +347,7 @@
       }
     }
     
-    .section-title {
+    .section_title {
       font-size: 16px;
       font-weight: 600;
       margin-bottom: 10px;
@@ -346,7 +356,7 @@
       padding-bottom: 8px;
     }
     
-    #animation-controls {
+    #animation_controls {
       position: absolute;
       bottom: 30px;
       left: 50%;
@@ -362,15 +372,15 @@
       transition: all 0.3s ease;
     }
     
-    #animation-controls > * {
+    #animation_controls > * {
       margin-bottom: 15px;
     }
     
-    #animation-controls > *:last-child {
+    #animation_controls > *:last-child {
       margin-bottom: 0;
     }
     
-    .progress-container {
+    .progress_container {
       width: 100%;
       height: 8px;
       background-color: #eee;
@@ -378,23 +388,23 @@
       overflow: hidden;
     }
     
-    .progress-bar {
+    .progress_bar {
       height: 100%;
       background-color: #4285f4;
       width: 0%;
       transition: width 0.2s;
     }
     
-    .animation-buttons {
+    .animation_buttons {
       display: flex;
       justify-content: center;
     }
     
-    .animation-buttons button:first-child {
+    .animation_buttons button:first-child {
       margin-right: 15px;
     }
     
-    .animation-month-display {
+    .animation_month_display {
       text-align: center;
       font-size: 16px;
       font-weight: 600;
@@ -402,7 +412,7 @@
       margin-bottom: 8px;
     }
     
-    .animation-title {
+    .animation_title {
       text-align: center;
       font-size: 18px;
       font-weight: 600;
@@ -410,27 +420,27 @@
       margin-bottom: 15px;
     }
     
-    #animation-play-btn {
+    #animation_play_btn {
       background-color: #4285f4;
       padding: 8px 20px;
       display: flex;
       align-items: center;
     }
     
-    #animation-play-btn i {
+    #animation_play_btn i {
       margin-right: 8px;
     }
     
-    #animation-play-btn:disabled {
+    #animation_play_btn:disabled {
       background-color: #a0a0a0;
       cursor: not-allowed;
     }
     
-    #animation-stop-btn {
+    #animation_stop_btn {
       background-color: #db4437;
     }
     
-    .layer-toggle {
+    .layer_toggle {
       margin-top: 15px;
       background-color: #f0f4f9;
       padding: 12px 15px;
@@ -438,7 +448,7 @@
       border: 1px solid #dde6f1;
     }
     
-    .toggle-switch {
+    .toggle_switch {
       position: relative;
       display: inline-block;
       width: 48px;
@@ -446,13 +456,13 @@
       margin-left: 10px;
     }
     
-    .toggle-switch input { 
+    .toggle_switch input { 
       opacity: 0;
       width: 0;
       height: 0;
     }
     
-    .toggle-slider {
+    .toggle_slider {
       position: absolute;
       cursor: pointer;
       top: 0;
@@ -464,7 +474,7 @@
       border-radius: 24px;
     }
     
-    .toggle-slider:before {
+    .toggle_slider:before {
       position: absolute;
       content: "";
       height: 18px;
@@ -476,22 +486,22 @@
       border-radius: 50%;
     }
     
-    input:checked + .toggle-slider {
+    input:checked + .toggle_slider {
       background-color: #4285f4;
     }
     
-    input:checked + .toggle-slider:before {
+    input:checked + .toggle_slider:before {
       transform: translateX(24px);
     }
     
-    .toggle-label {
+    .toggle_label {
       display: flex;
       align-items: center;
       font-size: 14px;
       font-weight: 500;
     }
     
-    .no-data {
+    .no_data {
       color: #888;
       font-style: italic;
       text-align: center;
@@ -503,16 +513,16 @@
         width: 280px;
       }
       
-      #title-bar {
+      #title_bar {
         max-width: 250px;
       }
       
-      #animation-controls {
+      #animation_controls {
         width: 90%;
       }
     }
 
-    .zoom-notification {
+    .zoom_notification {
       position: fixed;
       bottom: 20px;
       left: 50%;
@@ -532,8 +542,9 @@
 </head>
 <body>
   <div id="map"></div>
+  <canvas id="text_canvas"></canvas>
   
-  <div id="title-bar">
+  <div id="title_bar">
     <h1>Philadelphia Indego Bike Share</h1>
     <p>January 2024 Flow Data Visualization</p>
     <p style="font-size: 13px; margin-top: 5px;">
@@ -541,15 +552,15 @@
     </p>
   </div>
   
-  <button id="panel-toggle">
+  <button id="panel_toggle">
     <i class="bi bi-layout-sidebar-reverse"></i> Toggle Panel
   </button>
   
   <div id="sidebar">
-    <div class="month-selector">
+    <div class="month_selector">
       <h3>Month:</h3>
-      <div class="select-container">
-        <select id="month-dropdown">
+      <div class="select_container">
+        <select id="month_dropdown">
           <option value="1">January</option>
           <option value="2">February</option>
           <option value="3">March</option>
@@ -566,109 +577,109 @@
       </div>
     </div>
     
-    <div class="layer-toggle">
-      <label class="toggle-label">
+    <div class="layer_toggle">
+      <label class="toggle_label">
         Show Census Tracts
-        <span class="toggle-switch">
-          <input type="checkbox" id="census-toggle">
-          <span class="toggle-slider"></span>
+        <span class="toggle_switch">
+          <input type="checkbox" id="census_toggle">
+          <span class="toggle_slider"></span>
         </span>
       </label>
     </div>
     
-    <div class="layer-toggle">
-      <label class="toggle-label">
+    <div class="layer_toggle">
+      <label class="toggle_label">
         Show Other Stations
-        <span class="toggle-switch">
+        <span class="toggle_switch">
           <input type="checkbox" id="other_stations_toggle" checked>
-          <span class="toggle-slider"></span>
+          <span class="toggle_slider"></span>
         </span>
       </label>
     </div>
     
-    <div class="layer-toggle">
-      <label class="toggle-label">
+    <div class="layer_toggle">
+      <label class="toggle_label">
         Show High Volume Flows (>5)
-        <span class="toggle-switch">
-          <input type="checkbox" id="trip-count-toggle">
-          <span class="toggle-slider"></span>
+        <span class="toggle_switch">
+          <input type="checkbox" id="trip_count_toggle">
+          <span class="toggle_slider"></span>
         </span>
       </label>
     </div>
     
     <div class="legend">
       <h3>Flow Legend</h3>
-      <div class="legend-item">
-        <div class="legend-color" style="background-color: rgba(107, 174, 214, 0.7);"></div>
+      <div class="legend_item">
+        <div class="legend_color" style="background-color: rgba(107, 174, 214, 0.7);"></div>
         <span>Inbound Trips</span>
       </div>
-      <div class="legend-item">
-        <div class="legend-color" style="background-color: rgba(253, 141, 60, 0.7);"></div>
+      <div class="legend_item">
+        <div class="legend_color" style="background-color: rgba(253, 141, 60, 0.7);"></div>
         <span>Outbound Trips</span>
       </div>
-      <div id="trip-count-legend" style="margin-top: 10px; font-size: 12px; color: #666; display: none;">
+      <div id="trip_count_legend" style="margin-top: 10px; font-size: 12px; color: #666; display: none;">
         <i class="bi bi-info-circle"></i> Only showing flows with more than 5 trips
       </div>
     </div>
     
-    <div class="station-selector">
-      <div class="section-title">Select Station</div>
-      <div class="select-container">
-        <select id="station-dropdown">
+    <div class="station_selector">
+      <div class="section_title">Select Station</div>
+      <div class="select_container">
+        <select id="station_dropdown">
           <option value="">Select a station...</option>
         </select>
       </div>
     </div>
     
-    <div id="station-info">
+    <div id="station_info">
       <p>Select a station from the dropdown or click on a station to view its flow data and daily activity.</p>
     </div>
     
-    <div id="station-charts" style="display: none;">
-      <div class="chart-container">
-        <div class="chart-title">Daily Borrow Count</div>
-        <div id="borrow-chart"></div>
+    <div id="station_charts" style="display: none;">
+      <div class="chart_container">
+        <div class="chart_title">Daily Borrow Count</div>
+        <div id="borrow_chart"></div>
       </div>
       
-      <div class="chart-container">
-        <div class="chart-title">Daily Return Count</div>
-        <div id="return-chart"></div>
+      <div class="chart_container">
+        <div class="chart_title">Daily Return Count</div>
+        <div id="return_chart"></div>
       </div>
       
-      <div class="chart-container">
-        <div class="chart-title">Daily Net Activity</div>
-        <div id="net-chart"></div>
+      <div class="chart_container">
+        <div class="chart_title">Daily Net Activity</div>
+        <div id="net_chart"></div>
       </div>
     </div>
     
-    <div class="info-panel">
+    <div class="info_panel">
       <p>This visualization shows bike share flow data for Philadelphia's Indego system in 2024. The thickness of flow lines represents the trip count between stations.</p>
       <p>Click on any station to filter flows and see only the trips starting or ending at that station. The map will zoom to the selected station.</p>
-      <button id="reset-view">Reset View</button>
-      <button id="start-animation" style="background-color: #0f9d58; margin-left: 10px;">
+      <button id="reset_view">Reset View</button>
+      <button id="start_animation" style="background-color: #0f9d58; margin-left: 10px;">
         <i class="bi bi-play-fill"></i> Start Animation
       </button>
     </div>
   </div>
   
-  <div id="animation-controls" style="display: none;">
-    <div class="animation-title">Station Flow Animation</div>
-    <div class="animation-month-display">Current Month: January</div>
-    <div class="progress-container">
-      <div class="progress-bar" id="animation-progress"></div>
+  <div id="animation_controls" style="display: none;">
+    <div class="animation_title">Station Flow Animation</div>
+    <div class="animation_month_display">Current Month: January</div>
+    <div class="progress_container">
+      <div class="progress_bar" id="animation_progress"></div>
     </div>
-    <div class="animation-buttons">
-      <button id="animation-play-btn">
+    <div class="animation_buttons">
+      <button id="animation_play_btn">
         <i class="bi bi-play-fill"></i> Play
       </button>
-      <button id="animation-stop-btn">
+      <button id="animation_stop_btn">
         <i class="bi bi-stop-fill"></i> Stop
       </button>
     </div>
   </div>
   
   <div id="loading">
-    <div class="loading-text">
+    <div class="loading_text">
       <div class="spinner"></div>
       <span>Loading data...</span>
     </div>
@@ -676,7 +687,7 @@
   
   <div id="tooltip" class="tooltip"></div>
   
-  <div id="zoom-notification" class="zoom-notification">Zooming to station</div>
+  <div id="zoom_notification" class="zoom_notification">Zooming to station</div>
 
   <script>
     var mapbox_tk = 'pk.eyJ1IjoiY2FzYWxlaTA1MjciLCJhIjoiY202ZXgyYzMzMDl1bjJxcTBmMngxd2cwNiJ9.GJxy6g5lb4gAK3wOW5PdXQ';
@@ -702,6 +713,17 @@
     var census_data = null;
     var census_added = false;
     var census_vis = false;
+    
+    var canvas = document.getElementById('text_canvas');
+    var ctx = canvas.getContext('2d');
+    
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      drawStationLabels();
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
     
     mapboxgl.accessToken = mapbox_tk;
     var map = new mapboxgl.Map({
@@ -740,7 +762,69 @@
     
     var tt = document.getElementById('tooltip');
     var load_ind = document.getElementById('loading');
-    var zoom_notif = document.getElementById('zoom-notification');
+    var zoom_notif = document.getElementById('zoom_notification');
+    
+    var visible_stations = new Set();
+    
+    function drawStationLabels() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      if (!sta_data || !sel_sta || !visible_stations.size) return;
+      
+      Object.entries(sta_data).forEach(function(entry) {
+        var name = entry[0];
+        var data = entry[1];
+        
+        if (!visible_stations.has(name)) return;
+        
+        var t_borrows = data.daily.reduce(function(sum, day) { 
+          return sum + (day.borrows || 0); 
+        }, 0);
+        
+        var t_returns = data.daily.reduce(function(sum, day) { 
+          return sum + (day.returns || 0); 
+        }, 0);
+        
+        var total_flow = t_borrows + t_returns;
+        
+        var text = total_flow.toString();
+        if (total_flow >= 1000) {
+          text = (total_flow / 1000).toFixed(1) + 'k';
+        }
+        
+        var pos = map.project(data.position);
+        
+        var max_flow = 0;
+        Object.values(sta_data).forEach(function(s) {
+          var borrows = s.daily.reduce(function(sum, day) { return sum + (day.borrows || 0); }, 0);
+          var returns = s.daily.reduce(function(sum, day) { return sum + (day.returns || 0); }, 0);
+          max_flow = Math.max(max_flow, borrows + returns);
+        });
+        
+        var base_radius = name === sel_sta ? 14 : 10;
+        var flow_radius = Math.sqrt(total_flow / max_flow) * 35;
+        var textLength = text.length;
+        var text_radius = Math.max(textLength * 5, 10);
+        var radius = Math.max(base_radius, flow_radius, text_radius);
+        
+        var fontSize = Math.min(Math.max(radius * 0.7, 10), 16);
+        
+        ctx.font = 'bold ' + fontSize + 'px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        
+        ctx.fillStyle = 'black';
+        ctx.fillText(text, pos.x, pos.y);
+      });
+    }
+    
+    map.on('move', function() {
+      drawStationLabels();
+    });
+    
+    map.on('zoom', function() {
+      drawStationLabels();
+    });
     
     function show_zoom(text, dur = 2000) {
       zoom_notif.textContent = text;
@@ -827,7 +911,7 @@
         
         census_added = true;
         
-        var census_tog = document.getElementById('census-toggle');
+        var census_tog = document.getElementById('census_toggle');
         census_tog.addEventListener('change', function(e) {
           if (census_added) {
             var vis = e.target.checked ? 'visible' : 'none';
@@ -846,20 +930,20 @@
       render_flows();
     });
     
-    document.getElementById('trip-count-toggle').addEventListener('change', function(e) {
+    document.getElementById('trip_count_toggle').addEventListener('change', function(e) {
       filter_trip = e.target.checked;
       render_flows();
       
       if (filter_trip) {
         show_zoom(`Showing only flows with more than ${min_trip} trips`);
-        document.getElementById('trip-count-legend').style.display = 'block';
+        document.getElementById('trip_count_legend').style.display = 'block';
       } else {
         show_zoom('Showing all flows');
-        document.getElementById('trip-count-legend').style.display = 'none';
+        document.getElementById('trip_count_legend').style.display = 'none';
       }
     });
     
-    var month_drop = document.getElementById('month-dropdown');
+    var month_drop = document.getElementById('month_dropdown');
     month_drop.addEventListener('change', function(e) {
       var sel_month = parseInt(e.target.value);
       if (sel_month !== cur_month) {
@@ -876,7 +960,7 @@
       
       var month_names = ['January', 'February', 'March', 'April', 'May', 'June', 
                          'July', 'August', 'September', 'October', 'November', 'December'];
-      document.querySelector('#title-bar p:first-of-type').textContent = `${month_names[month-1]} 2024 Flow Data Visualization`;
+      document.querySelector('#title_bar p:first-of-type').textContent = `${month_names[month-1]} 2024 Flow Data Visualization`;
       
       if (!anim_play) {
         flow_data = null;
@@ -884,9 +968,9 @@
       }
       
       month_drop.value = month.toString();
-      document.querySelector('.animation-month-display').textContent = `Current Month: ${month_names[month-1]}`;
+      document.querySelector('.animation_month_display').textContent = `Current Month: ${month_names[month-1]}`;
       
-      var prog_bar = document.getElementById('animation-progress');
+      var prog_bar = document.getElementById('animation_progress');
       if (prog_bar) {
         prog_bar.style.width = `${((month - 1) / 11) * 100}%`;
       }
@@ -976,13 +1060,13 @@
         is_load = false;
         load_ind.style.display = 'none';
         
-        var play_btn = document.getElementById('animation-play-btn');
+        var play_btn = document.getElementById('animation_play_btn');
         if (play_btn) play_btn.disabled = true;
       });
     }
     
     function update_ui(month) {
-      var sta_drop = document.getElementById('station-dropdown');
+      var sta_drop = document.getElementById('station_dropdown');
       sta_drop.innerHTML = '<option value="">Select a station...</option>';
       
       var sta_names = Object.keys(sta_data).sort();
@@ -1030,6 +1114,8 @@
     function render_flows() {
       if (!flow_data || !sta_data || !sel_sta) return;
       
+      visible_stations = new Set();
+      
       var vis_flows = flow_data.filter(function(flow) {
         var sta_match = flow.start_name === sel_sta || 
                        flow.end_name === sel_sta;
@@ -1049,7 +1135,7 @@
       
       var flow_lyrs = [
         new deck.PathLayer({
-          id: 'in-flows',
+          id: 'in_flows',
           data: vis_flows.filter(function(f) { return f.end_name === sel_sta; }),
           pickable: true,
           widthUnits: 'pixels',
@@ -1080,7 +1166,7 @@
         }),
         
         new deck.PathLayer({
-          id: 'out-flows',
+          id: 'out_flows',
           data: vis_flows.filter(function(f) { return f.start_name === sel_sta; }),
           pickable: true,
           widthUnits: 'pixels',
@@ -1118,6 +1204,13 @@
         var t_borrows = data.daily.reduce(function(sum, day) { return sum + (day.borrows || 0); }, 0);
         var t_returns = data.daily.reduce(function(sum, day) { return sum + (day.returns || 0); }, 0);
         var net_act = t_returns - t_borrows;
+        var total_flow = t_borrows + t_returns;
+        
+        var is_visible = show_other || name === sel_sta || conn_stas.has(name);
+        
+        if (is_visible) {
+          visible_stations.add(name);
+        }
         
         return {
           name: name,
@@ -1125,12 +1218,15 @@
           borrows: t_borrows,
           returns: t_returns,
           net: net_act,
+          total_flow: total_flow,
           sel: name === sel_sta,
-          vis: show_other || name === sel_sta || conn_stas.has(name)
+          vis: is_visible
         };
       }).filter(function(station) {
         return station.vis;
       });
+      
+      var max_flow = d3.max(sta_pts, function(d) { return d.total_flow; }) || 1;
       
       var sta_lyr = new deck.ScatterplotLayer({
         id: 'stations',
@@ -1141,14 +1237,23 @@
         filled: true,
         radiusUnits: 'pixels',
         getPosition: function(d) { return d.pos; },
-        getRadius: function(d) { return d.sel ? 12 : 8; },
+        getRadius: function(d) { 
+          var textLength = d.total_flow.toString().length;
+          
+          var base_radius = d.sel ? 14 : 10;
+          var flow_radius = Math.sqrt(d.total_flow / max_flow) * 35;
+          
+          var text_radius = Math.max(textLength * 5, 10);
+          
+          return Math.max(base_radius, flow_radius, text_radius);
+        },
         getFillColor: function(d) { return d.sel ? sel_col : sta_col; },
         getLineColor: function(d) { return d.sel ? [255, 255, 255] : [200, 200, 200]; },
         getLineWidth: function(d) { return d.sel ? 2 : 1; },
         onClick: function(info) {
           if (info.object) {
             sel_sta = info.object.name;
-            document.getElementById('station-dropdown').value = sel_sta;
+            document.getElementById('station_dropdown').value = sel_sta;
             update_sta_info(sel_sta);
             render_flows();
             
@@ -1169,11 +1274,13 @@
             var borrows = info.object.borrows || 0;
             var returns = info.object.returns || 0;
             var net = info.object.net || 0;
+            var total = info.object.total_flow || 0;
             
             tt.innerHTML = `
               <strong>${name}</strong><br>
               Borrows: ${borrows}<br>
               Returns: ${returns}<br>
+              Total Flow: ${total}<br>
               Net: ${net > 0 ? '+' : ''}${net}
             `;
           } else {
@@ -1185,16 +1292,18 @@
       deck_ovl.setProps({
         layers: [...flow_lyrs, sta_lyr]
       });
+      
+      drawStationLabels();
     }
     
     function update_trip_ind() {
-      document.getElementById('trip-count-legend').style.display = 
+      document.getElementById('trip_count_legend').style.display = 
         filter_trip ? 'block' : 'none';
     }
     
     function update_sta_info(sta_name) {
-      var info_div = document.getElementById('station-info');
-      var charts_div = document.getElementById('station-charts');
+      var info_div = document.getElementById('station_info');
+      var charts_div = document.getElementById('station_charts');
       
       if (!sta_name || !sta_data || !sta_data[sta_name]) {
         info_div.innerHTML = '<p>Select a station from the dropdown or click on a station to view its flow data and daily activity.</p>';
@@ -1207,12 +1316,14 @@
       var t_borrows = sta_info.daily.reduce(function(sum, day) { return sum + (day.borrows || 0); }, 0);
       var t_returns = sta_info.daily.reduce(function(sum, day) { return sum + (day.returns || 0); }, 0);
       var net_act = t_returns - t_borrows;
+      var total_flow = t_borrows + t_returns;
       
       info_div.innerHTML = `
-        <div id="station-title">${sta_name}</div>
+        <div id="station_title">${sta_name}</div>
         <p>
           Total Borrows: <strong>${t_borrows}</strong><br>
           Total Returns: <strong>${t_returns}</strong><br>
+          Total Flow: <strong>${total_flow}</strong><br>
           Net Activity: <strong>${net_act > 0 ? '+' : ''}${net_act}</strong>
         </p>
       `;
@@ -1226,9 +1337,9 @@
         return isNaN(date_a) || isNaN(date_b) ? 0 : date_a - date_b;
       });
       
-      draw_chart('borrow-chart', sort_act, 'borrows', 'steelblue');
-      draw_chart('return-chart', sort_act, 'returns', 'darkgreen');
-      draw_net_chart('net-chart', sort_act);
+      draw_chart('borrow_chart', sort_act, 'borrows', 'steelblue');
+      draw_chart('return_chart', sort_act, 'returns', 'darkgreen');
+      draw_net_chart('net_chart', sort_act);
     }
     
     function draw_chart(cont_id, data, prop, color) {
@@ -1238,7 +1349,7 @@
       cont.innerHTML = '';
       
       if (!data || data.length === 0) {
-        cont.innerHTML = '<p class="no-data">No data available</p>';
+        cont.innerHTML = '<p class="no_data">No data available</p>';
         return;
       }
       
@@ -1258,7 +1369,7 @@
       });
       
       if (valid.length === 0) {
-        cont.innerHTML = '<p class="no-data">No valid data available</p>';
+        cont.innerHTML = '<p class="no_data">No valid data available</p>';
         return;
       }
       
@@ -1301,11 +1412,11 @@
           .y1(function(d) { return y(d[prop]); })
         );
       
-      var chart_tt = d3.select('body').select('.chart-tooltip');
+      var chart_tt = d3.select('body').select('.chart_tooltip');
       if (chart_tt.empty()) {
         chart_tt = d3.select('body')
           .append('div')
-          .attr('class', 'chart-tooltip')
+          .attr('class', 'chart_tooltip')
           .style('opacity', 0);
       }
       
@@ -1342,7 +1453,7 @@
       cont.innerHTML = '';
       
       if (!data || data.length === 0) {
-        cont.innerHTML = '<p class="no-data">No data available</p>';
+        cont.innerHTML = '<p class="no_data">No data available</p>';
         return;
       }
       
@@ -1362,7 +1473,7 @@
       });
       
       if (valid.length === 0) {
-        cont.innerHTML = '<p class="no-data">No valid data available</p>';
+        cont.innerHTML = '<p class="no_data">No valid data available</p>';
         return;
       }
       
@@ -1426,11 +1537,11 @@
           .y1(function(d) { return y(d.net); })
         );
       
-      var chart_tt = d3.select('body').select('.chart-tooltip');
+      var chart_tt = d3.select('body').select('.chart_tooltip');
       if (chart_tt.empty()) {
         chart_tt = d3.select('body')
           .append('div')
-          .attr('class', 'chart-tooltip')
+          .attr('class', 'chart_tooltip')
           .style('opacity', 0);
       }
       
@@ -1463,21 +1574,21 @@
     function start_anim() {
       if (anim_play) return;
       
-      document.getElementById('animation-controls').style.display = 'flex';
+      document.getElementById('animation_controls').style.display = 'flex';
       
       anim_play = true;
       
-      document.getElementById('month-dropdown').disabled = true;
-      document.getElementById('station-dropdown').disabled = true;
-      document.getElementById('reset-view').disabled = true;
-      document.getElementById('start-animation').disabled = true;
-      document.getElementById('census-toggle').disabled = true;
+      document.getElementById('month_dropdown').disabled = true;
+      document.getElementById('station_dropdown').disabled = true;
+      document.getElementById('reset_view').disabled = true;
+      document.getElementById('start_animation').disabled = true;
+      document.getElementById('census_toggle').disabled = true;
       document.getElementById('other_stations_toggle').disabled = true;
-      document.getElementById('trip-count-toggle').disabled = true;
+      document.getElementById('trip_count_toggle').disabled = true;
       
       cur_month = 1;
       
-      document.getElementById('animation-play-btn').disabled = true;
+      document.getElementById('animation_play_btn').disabled = true;
       
       preload_anim();
     }
@@ -1485,7 +1596,7 @@
     function preload_anim() {
       is_load = true;
       load_ind.style.display = 'block';
-      load_ind.querySelector('.loading-text span').textContent = 'Preparing animation...';
+      load_ind.querySelector('.loading_text span').textContent = 'Preparing animation...';
       
       var months = Array.from({ length: 12 }, function(_, i) { return i + 1; });
       
@@ -1556,7 +1667,7 @@
           };
           
           loaded++;
-          var prog_bar = document.getElementById('animation-progress');
+          var prog_bar = document.getElementById('animation_progress');
           if (prog_bar) {
             prog_bar.style.width = `${(loaded / 12) * 100}%`;
           }
@@ -1565,7 +1676,7 @@
             is_load = false;
             load_ind.style.display = 'none';
             
-            var play_btn = document.getElementById('animation-play-btn');
+            var play_btn = document.getElementById('animation_play_btn');
             if (play_btn) play_btn.disabled = false;
             
             if (prog_bar) prog_bar.style.width = '0%';
@@ -1590,7 +1701,7 @@
       
       anim_play = true;
       
-      var play_btn = document.getElementById('animation-play-btn');
+      var play_btn = document.getElementById('animation_play_btn');
       if (play_btn) play_btn.disabled = true;
       
       load_data(cur_month);
@@ -1609,19 +1720,19 @@
       
       anim_play = false;
       
-      var anim_ctrls = document.getElementById('animation-controls');
+      var anim_ctrls = document.getElementById('animation_controls');
       if (anim_ctrls) anim_ctrls.style.display = 'none';
       
-      document.getElementById('month-dropdown').disabled = false;
-      document.getElementById('station-dropdown').disabled = false;
-      document.getElementById('reset-view').disabled = false;
-      document.getElementById('start-animation').disabled = false;
-      document.getElementById('census-toggle').disabled = false;
+      document.getElementById('month_dropdown').disabled = false;
+      document.getElementById('station_dropdown').disabled = false;
+      document.getElementById('reset_view').disabled = false;
+      document.getElementById('start_animation').disabled = false;
+      document.getElementById('census_toggle').disabled = false;
       document.getElementById('other_stations_toggle').disabled = false;
-      document.getElementById('trip-count-toggle').disabled = false;
+      document.getElementById('trip_count_toggle').disabled = false;
     }
     
-    document.getElementById('station-dropdown').addEventListener('change', function(e) {
+    document.getElementById('station_dropdown').addEventListener('change', function(e) {
       var new_sta = e.target.value || null;
       
       if (new_sta) {
@@ -1637,7 +1748,7 @@
       }
     });
     
-    document.getElementById('reset-view').addEventListener('click', function() {
+    document.getElementById('reset_view').addEventListener('click', function() {
       map.flyTo({
         center: [-75.16, 39.95],
         zoom: 12,
@@ -1647,13 +1758,13 @@
       show_zoom('Resetted to overview');
     });
     
-    document.getElementById('start-animation').addEventListener('click', start_anim);
+    document.getElementById('start_animation').addEventListener('click', start_anim);
     
-    document.getElementById('animation-play-btn').addEventListener('click', play_anim);
+    document.getElementById('animation_play_btn').addEventListener('click', play_anim);
     
-    document.getElementById('animation-stop-btn').addEventListener('click', stop_anim);
+    document.getElementById('animation_stop_btn').addEventListener('click', stop_anim);
     
-    document.getElementById('panel-toggle').addEventListener('click', function() {
+    document.getElementById('panel_toggle').addEventListener('click', function() {
       var sidebar = document.getElementById('sidebar');
       
       if (sb_vis) {
