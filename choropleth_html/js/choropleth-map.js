@@ -10,7 +10,7 @@ async function initChoroplethDataWithLegend(data,legendInfo,type) {
     const choroplethData=[];
     const features=data.features;
     features.forEach(feature => {
-        //根据legendInfo中的min和max，找到对应的color
+        //Find the corresponding color based on min and max in legendInfo
         const colorInfo=legendInfo.find(item=>item.min<=feature.properties[attributesName[type]]&&item.max>=feature.properties[attributesName[type]]);
         // console.log(colorInfo)
         const d={
