@@ -12,11 +12,10 @@
       background-color: #002147;
     }
 
-    /* 封面页样式 */
     #cover-page {
       width: 100%;
       height: 100vh;
-      background-image: url('./img/bg.jpg');  /* ✅ 请确保路径正确 */
+      background-image: url('./img/bg.jpg');
       background-size: cover;
       background-position: center;
       display: flex;
@@ -62,7 +61,6 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
-    /* 菜单栏样式 */
     #menu {
       position: fixed;
       top: 0;
@@ -111,7 +109,6 @@
 </head>
 <body>
 
-<!-- ✅ 封面页 -->
 <div id="cover-page">
   <div class="cover-content">
     <h1>Philadelphia's Bikeshare and Business Networks</h1>
@@ -120,7 +117,6 @@
   </div>
 </div>
 
-<!-- ✅ 主导航菜单 -->
 <ul id="menu">
   <li><a href="#intro">Introduction</a></li>
   <li><a href="#motivation">Motivation</a></li>
@@ -136,7 +132,6 @@
   <li><a href="#about">About</a></li>
 </ul>
 
-<!-- ✅ 各子页面 iframe -->
 <div class="section" id="intro"><iframe src="./intro/intro.html"></iframe></div>
 <div class="section" id="motivation"><iframe src="./motivation/motivation.html"></iframe></div>
 <div class="section" id="heatmap"><iframe src="./heat-map/heat-map.html"></iframe></div>
@@ -150,7 +145,6 @@
 <div class="section" id="references"><iframe src="./references/references.html"></iframe></div>
 <div class="section" id="about"><iframe src="./about/about1.html"></iframe></div>
 
-<!-- ✅ JS 滚动和菜单高亮 -->
 <script>
   const links = document.querySelectorAll('#menu a');
   const sections = document.querySelectorAll('.section');
