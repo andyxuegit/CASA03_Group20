@@ -122,9 +122,10 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             font-weight: 600;
         }
+
         .data-source {
             color: #fff;
-          
+
         }
     </style>
 </head>
@@ -182,12 +183,14 @@
         document.querySelectorAll('.tool-toolbar button').forEach(button => {
             button.addEventListener('click', () => selectTool(button.id));
         });
-        //默认选中businessDensity
+        //Select businessDensity by default
         selectTool('businessDensity');
 
         async function initDifferentData() {
             const response = await fetch('../scatter-plot-map/geojson/bike_buffer_wgs84.geojson');
             const response2 = await fetch('../scatter-plot-map/geojson/service_area_proportion_surface_wgs84.geojson');
+            // const response = await fetch('../geojson/bike_buffer_wgs84.geojson');
+            // const response2 = await fetch('../geojson/service_area_proportion_surface_wgs84.geojson');
             const dataSets = {
                 'businessDensity': [],
                 'populationDensity': [],
@@ -231,10 +234,10 @@
                 btn.classList.remove('selected');
             });
             const titles = {
-                businessDensity: 'Trip Volume vs Business Density<br>y = 6.1522x + 7590.6839',
-                populationDensity: 'Trip Volume vs Population Density<br>y = -0.0008x + 10574.0757',
-                medianIncome: 'Trip Volume vs Median Income<br>y = 0.0816x + 2945.6735',
-                whiteProportion: 'Trip Volume vs White Proportion<br>y = 173.78x + 1187.18',
+                businessDensity: 'Business Density<br>y = 6.1522x + 7590.6839 R²=0.2113',
+                populationDensity: 'Population Density<br>y = -0.0008x + 10574.0757 R²=0.0018',
+                medianIncome: 'Median Income<br>y = 0.0816x + 2945.6735 R²=0.1457',
+                whiteProportion: 'White Population Proportion<br>y = 173.78x + 1187.18 R²=0.2247',
             }
             // add selected effect to the current selected button
             const button = document.getElementById(type);
@@ -276,7 +279,7 @@
                     tickLength: 5,           // tick line length
                     lineColor: '#E0E0E0',    // axis line color
                     title: {
-                        text: type,
+                        text: titles[type],
                         style: {
                             color: '#E0E0E0',
                             fontSize: '14px'
@@ -335,10 +338,10 @@
                             lineWidth: 0
                         }
                     },
-                    enableMouseTracking: false
+                    enableMouseTracking: false,
                 }, {
                     type: 'scatter',
-                    name: type,
+                    name: titles,
                     data: differentDataSets[type],
                     marker: {
                         radius: 5,
